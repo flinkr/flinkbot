@@ -1,0 +1,25 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+                "module": "commonjs", 
+                "target": "es5",
+                "outDir": "./dist",
+                "sourceMap": true,
+                "declaration": false,
+                "removeComments": true
+            },
+    "files": [
+          "./src/app.ts"  
+        // , "./src/console.ts"
+        // , "./src/universal.ts" 
+        // , "./src/dialog.ts"
+        // , "./src/intent.ts"
+        // , "./src/intentTriggerAction.ts"
+        // , "./src/luis.ts"
+        // , "./src/storage.ts"
+    ],
+    "exclude": [
+        "./node_modules",
+        "./dist"
+    ]
+}    
