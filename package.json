@@ -1,0 +1,30 @@
+{
+  "name": "flinkbot",
+  "version": "1.0.0",
+  "description": "Bot for Flink",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/goflink/flinkbot.git"
+  },
+  "keywords": [
+    "flink",
+    "bot",
+    "microsoft",
+    "bot",
+    "framework"
+  ],
+  "author": "Timo Hegnaure",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/goflink/flinkbot/issues"
+  },
+  "homepage": "https://gitlab.com/goflink/flinkbot#README",
+  "dependencies": {
+    "botbuilder": "^3.14.0",
+    "typescript": "^2.7.1"
+  }
+}
