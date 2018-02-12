@@ -25,7 +25,9 @@
   },
   "homepage": "https://gitlab.com/goflink/flinkbot#README",
   "dependencies": {
+    "@types/restify": "^5.0.7",
     "botbuilder": "^3.14.0",
+    "restify": "^6.3.4",
     "typescript": "^2.7.1"
   }
 }
