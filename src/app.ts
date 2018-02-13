@@ -4,6 +4,7 @@
 
 import * as builder from "botbuilder";
 import * as restify from "restify";
+import * as flinkapi from "./flinkapi";
 
 let server = restify.createServer();
 server.listen(process.env.port|| process.env.PORT || 3978, () => {
@@ -22,15 +23,26 @@ server.post("/api/messages", conn.listen());
 //Waterfall method, goes from function to function, tells it whats next
 bot.dialog("/", [
     (sess, args, next) => {
-        if(!sess.userData.name){
-            builder.Prompts.text(sess, "Hello, user! What is your name?");
-        }
-        else{
-            next();
-        }
+        builder.Prompts.text(sess, "Hi what is your email address?");
     },
     (sess, result) =>{
-         sess.userData.name = result.response;
-         sess.send(`Hello, ${sess.userData.name}`);
+		 sess.userData.email = result;
+		 builder.Prompts.text(sess, "Ok, whats your password?");
+	},
+    (sess, result) =>{
+		 sess.userData.password = result;
+		 (async () => sess.userData.token = await flinkapi.getToken())();
+		 console.log("this is the token now:" +JSON.stringify(sess.userData.token));
+		 builder.Prompts.choice(sess, "Do you want to print your token now?", [
+			 "Yes", "No"
+		 ]);
+	},
+    (sess, result) =>{
+		 if(result.response.entity === "Yes"){
+			sess.send(`Ok, this is your token ${sess.userData.token}`)
+		 }else{
+			 //go back to root dialog, start over
+			 sess.replaceDialog("/");
+		 }
 	}
 ]) 
