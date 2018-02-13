@@ -31,15 +31,16 @@ bot.dialog("/", [
 	},
     (sess, result) =>{
 		 sess.userData.password = result;
-		 (async () => sess.userData.token = await flinkapi.getToken())();
-		 console.log("this is the token now:" +JSON.stringify(sess.userData.token));
+		 //will be set asynchonously
+		 (async () => sess.userData.zipCode = await flinkapi.getZipCode())();
 		 builder.Prompts.choice(sess, "Do you want to print your token now?", [
 			 "Yes", "No"
 		 ]);
 	},
-    (sess, result) =>{
+	(sess, result) =>
+	{
 		 if(result.response.entity === "Yes"){
-			sess.send(`Ok, this is your token ${sess.userData.token}`)
+			sess.send(`Ok, this is your ZipCode ${sess.userData.zipCode}`)
 		 }else{
 			 //go back to root dialog, start over
 			 sess.replaceDialog("/");

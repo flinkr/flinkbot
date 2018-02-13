@@ -4,9 +4,12 @@ import * as restify from "restify";
 
 
 
-export async function getToken(){
+export async function getZipCode(){
     try{
-        return await login("blah", "blah");
+        let token = await login("blah", "blah");
+        let userInfo= await getUserInfo(token);
+        let zipCode = userInfo.zipCode;
+        return zipCode;
     } catch (err){
         return err;
     }
@@ -27,4 +30,12 @@ export function login(email: string, password: string){
     return rp(options);
 }
 
-
+export function getUserInfo(token: string){
+    const options = {
+        method: 'GET',
+        uri: 'https://test.goflink.ch/api/v1/customers/me',
+        headers: { Authorization: 'Bearer '+token },
+        json: true // Automatically stringifies the body to JSON
+    };
+    return rp(options);
+}
