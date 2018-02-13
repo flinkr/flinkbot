@@ -22,8 +22,17 @@ server.post("/api/messages", conn.listen());
 
 //Waterfall method, goes from function to function, tells it whats next
 bot.dialog("/", [
-    (sess, args, next) => {
-        builder.Prompts.text(sess, "Hi what is your email address?");
+	(sess, args, next) => {
+		if(!sess.userData.authToken){
+			sess.beginDialog("/login")
+		}
+		else{
+			next();
+		}
+	},
+
+    (sess, result) => {
+        builder.Prompts.text(sess, `Hi, your authtoken is ${sess.userData.authToken} what is your email address?`);
     },
     (sess, result) =>{
 		 sess.userData.email = result;
@@ -46,4 +55,14 @@ bot.dialog("/", [
 			 sess.replaceDialog("/");
 		 }
 	}
-]) 
+]);
+
+bot.dialog("/login", [
+	(sess, args, next) =>{
+		builder.Prompts.text(sess, "Hi, user, what is your authToken?")
+	},
+	(sess, result) => {
+		sess.userData.authToken = result.response;
+		sess.endDialog();
+	}
+])
