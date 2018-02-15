@@ -27,6 +27,10 @@ Get what exactly the user typed in instead of just intend (and save it as dialog
 Types:
 -sess: builder.Session
 
-
+Get intentss => args.intent
 
 For support of .env files, dotenv was used.
+
+
+
+Issue with missing type definitions in azure botbuilder: https://github.com/Microsoft/BotBuilder-Azure/issues/38
