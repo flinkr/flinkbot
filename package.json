@@ -43,7 +43,7 @@
     "@types/dotenv": "^4.0.2",
     "@types/restify": "^5.0.7",
     "@types/tedious": "^1.8.32",
-    "botbuilder": "^3.14.0",
+    "botbuilder": "^3.13.1",
     "botbuilder-azure": "^3.0.4",
     "dotenv": "^5.0.0",
     "request-promise": "^4.2.2",
