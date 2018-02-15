@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "preinstall": "npm cache clear",
+    "preinstall": "npm cache clear --force",
     "postinstall": "tsc -p ."
   },
   "repository": {
