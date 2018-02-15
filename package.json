@@ -4,8 +4,7 @@
   "description": "Bot for Flink",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "tsc -p ."
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -24,6 +23,10 @@
     "url": "https://gitlab.com/goflink/flinkbot/issues"
   },
   "homepage": "https://gitlab.com/goflink/flinkbot#README",
+  "engines": {
+    "node": "= 6.12.3",
+    "npm": "= 3.10.10"
+  },
   "dependencies": {
     "@types/dotenv": "^4.0.2",
     "@types/restify": "^5.0.7",
