@@ -1,9 +1,10 @@
 import * as builder from "botbuilder";
-import * as azure from "botbuilder-azure";
+// import * as azure from "botbuilder-azure";
 import * as dotenv from "dotenv";
 import * as restify from "restify";
 import * as flinkapi from "./flinkapi";
 
+let azure = require("botbuilder-azure");
 dotenv.config();
 
 const documentDbOptions = {
