@@ -49,7 +49,7 @@ bot.dialog("/Login", (session) => {
 		new builder.SigninCard(session)
 			.text("Bitte logge dich hier ein")
 			.button(
-				"Login", "http//:www.goflink.ch",
+				"Login", "https://www.goflink.ch",
 			),
 		// new builder.HeroCard(session)
 		// 	.title("Classic White T-Shirt")
