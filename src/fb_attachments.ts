@@ -16,7 +16,7 @@ export function fbWebviewLogin(): object {
 							buttons: [
 								{
 									type: "web_url",
-									url: "https://www.goflink.ch",
+									url: "https://flinkbot-webview-win.azurewebsites.net/login?userId=I1KJ4DNAAEP",
 									title: "Login",
 									webview_height_ratio: "compact",
 									messenger_extensions: true,
