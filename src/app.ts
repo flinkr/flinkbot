@@ -51,6 +51,7 @@ bot.dialog("/Login", (session) => {
 		facebook: {
 			// format according to channel's requirements
 			// (in our case, the above JSON required by Facebook)
+			// https://developers.facebook.com/docs/messenger-platform/reference/buttons/url
 			attachment: {
 				type: "template",
 				payload: {
@@ -64,10 +65,7 @@ bot.dialog("/Login", (session) => {
 									type: "web_url",
 									url: "https://dev.botframework.com",
 									title: "Go to Dev Portal",
-								},
-								{
-									// this is our share button
-									type: "element_share",
+									webview_height_ratio: "compact",
 								},
 							],
 						},
