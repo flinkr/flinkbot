@@ -45,13 +45,13 @@ function getEntity(botbuilder: any, args: any, entity: string): string {
 	return botbuilder.EntityRecognizer.findEntity(args.intent.entities.entities);
 }
 
-bot.dialog("/getId", (session) => {
-	// construct a new message with the current session context
-	console.log("This is the userdata: " + JSON.stringify(session.userData));
-	console.log("This is the username: " + session.userData.username);
-	let userId = session.message.user.id;
-	session.send(`Your Id is: ${userId}`);
-}).triggerAction({ matches: "print id" });
+// bot.dialog("/getId", (session) => {
+// 	// construct a new message with the current session context
+// 	console.log("This is the userdata: " + JSON.stringify(session.userData));
+// 	console.log("This is the username: " + session.userData.username);
+// 	let userId = session.message.user.id;
+// 	session.send(`Your Id is: ${userId}`);
+// }).triggerAction({ matches: "print id" });
 
 bot.dialog("/Login", (session) => {
 	// construct a new message with the current session context
@@ -68,6 +68,39 @@ bot.dialog("/FAQAddress",
 	},
 ).triggerAction({
 	matches: "FAQ: Adresse von Flink",
+});
+
+bot.dialog("/GetZipCode",
+	(session, args) => {
+		let token = "BearereyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY2giLCJleHAiOjE1MTkwNzEwODUsImlhdCI6MTUxOTA2Mzg4NX0.h5sQsOdpztSGVasDWAjpmYrev_2WRf5HsfksgSv-udhdqtMIXT8p-FVLdswV7T06IQoqIGbg-fbSuHswJeCcLw"
+		flinkapi.getZipCode(token);
+
+
+
+
+		
+		// session.send(`Dies ist deine Postleitzahl:lakjflds`);
+		// (async () => {
+		// 	let zip = await flinkapi.getZipCode(session.userData.authToken);
+		// 	console.log("this is your zip code: " + zip);
+		// session.endDialog();
+
+		// })();
+
+
+		// (async () => {
+		// 	try {
+		// 		let zip = await flinkapi.getZipCode(session.userData.authToken);
+				session.send(`Dies ist deine Postleitzahl:`);
+				session.endDialog();
+		// 	} catch (err) {
+		// 		return err;
+		// 	}
+		// });
+	},
+).triggerAction({
+	matches: "Meine PLZ",
+
 });
 
 bot.dialog("/CostsOfInsurance",
