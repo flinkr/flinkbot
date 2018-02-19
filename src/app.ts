@@ -52,19 +52,6 @@ bot.dialog("/Login", (session) => {
 	session.send(msg).endDialog();
 }).triggerAction({ matches: "Login" });
 
-// bot.dialog("/Login", (session) => {
-// 	const msg = new builder.Message(session);
-// 	msg.attachmentLayout(builder.AttachmentLayout.carousel);
-// 	msg.attachments([
-// 		new builder.SigninCard(session)
-// 			.text("Bitte logge dich hier ein")
-// 			.button(
-// 				"Login", "https://www.goflink.ch",
-// 			),
-// 	]);
-// 	session.send(msg).endDialog();
-// }).triggerAction({ matches: "Login" });
-
 bot.dialog("/FAQAddress",
 	(session, args) => {
 		// logIntents(args);

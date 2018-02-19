@@ -19,7 +19,7 @@ export function fbWebviewLogin(): object {
 									url: "https://www.goflink.ch",
 									title: "Login",
 									webview_height_ratio: "compact",
-									// "messenger_extensions": true,
+									messenger_extensions: true,
 								},
 							],
 						},
@@ -29,3 +29,16 @@ export function fbWebviewLogin(): object {
 		},
 	};
 }
+
+// bot.dialog("/Login", (session) => {
+// 	const msg = new builder.Message(session);
+// 	msg.attachmentLayout(builder.AttachmentLayout.carousel);
+// 	msg.attachments([
+// 		new builder.SigninCard(session)
+// 			.text("Bitte logge dich hier ein")
+// 			.button(
+// 				"Login", "https://www.goflink.ch",
+// 			),
+// 	]);
+// 	session.send(msg).endDialog();
+// }).triggerAction({ matches: "Login" });
