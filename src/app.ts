@@ -64,7 +64,7 @@ bot.dialog("/Login", (session) => {
 										url: "https://www.goflink.ch",
 										title: "Login",
 										webview_height_ratio: "compact",
-										"messenger_extensions": true,
+										// "messenger_extensions": true,
 									},
 								],
 							},
