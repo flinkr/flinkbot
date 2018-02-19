@@ -47,7 +47,33 @@ function getEntity(botbuilder: any, args: any, entity: string): string {
 
 bot.dialog("/Login", (session) => {
 	// construct a new message with the current session context
-	const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewLogin());
+	const msg = new builder.Message(session).sourceEvent(
+		{
+			facebook: {
+				attachment: {
+					type: "template",
+					payload: {
+						template_type: "generic",
+						elements: [
+							{
+								title: "Bitte bei Flink einloggen",
+								// subtitle: "This is subtitle",
+								buttons: [
+									{
+										type: "web_url",
+										url: "https://www.goflink.ch",
+										title: "Login",
+										webview_height_ratio: "compact",
+										"messenger_extensions": true,
+									},
+								],
+							},
+						],
+					},
+				},
+			},
+		},
+	);
 
 	session.send(msg).endDialog();
 }).triggerAction({ matches: "Login" });
