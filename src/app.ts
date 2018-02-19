@@ -47,7 +47,7 @@ function getEntity(botbuilder: any, args: any, entity: string): string {
 
 bot.dialog("/Login", (session) => {
 	// construct a new message with the current session context
-	const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewLogin);
+	const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewLogin());
 
 	session.send(msg).endDialog();
 }).triggerAction({ matches: "Login" });
