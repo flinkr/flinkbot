@@ -2,7 +2,7 @@
 // https://github.com/Microsoft/BotBuilder-Samples/blob/master/Node/blog-customChannelData/app.js
 // https://developers.facebook.com/docs/messenger-platform/reference/buttons/url
 
-export function fbWebviewLogin(): object {
+export function fbWebviewLogin(userId: string): object {
 	return {
 		facebook: {
 			attachment: {
@@ -16,7 +16,7 @@ export function fbWebviewLogin(): object {
 							buttons: [
 								{
 									type: "web_url",
-									url: "https://flinkbot-webview-win.azurewebsites.net/login?userId=I1KJ4DNAAEP",
+									url: `https://flinkbot-webview-win.azurewebsites.net/login?userId=${userId}`,
 									title: "Login",
 									webview_height_ratio: "compact",
 									messenger_extensions: true,

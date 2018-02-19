@@ -45,9 +45,17 @@ function getEntity(botbuilder: any, args: any, entity: string): string {
 	return botbuilder.EntityRecognizer.findEntity(args.intent.entities.entities);
 }
 
+bot.dialog("/getId", (session) => {
+	// construct a new message with the current session context
+	console.log("This is the userdata: " + JSON.stringify(session.userData));
+	console.log("This is the username: " + session.userData.username);
+	let userId = session.message.user.id;
+	session.send(`Your Id is: ${userId}`);
+}).triggerAction({ matches: "print id" });
+
 bot.dialog("/Login", (session) => {
 	// construct a new message with the current session context
-	const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewLogin());
+	const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewLogin(session.message.user.id));
 
 	session.send(msg).endDialog();
 }).triggerAction({ matches: "Login" });
