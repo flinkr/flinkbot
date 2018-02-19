@@ -6,7 +6,8 @@
                 "outDir": "./dist",
                 "sourceMap": true,
                 "declaration": false,
-                "removeComments": true
+                "removeComments": true,
+                "lib": [ "es2015" ]
             },
     "files": [
           "./src/app.ts",  

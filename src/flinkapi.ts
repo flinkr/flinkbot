@@ -2,9 +2,7 @@ import * as rp from "request-promise";
 import * as restify from "restify";
 
 export async function getZipCode(token: string) {
-	console.log("getzip started");
 	try {
-		console.log("try started");
 		let userInfo = await getUserInfo(token);
 		// tslint:disable-next-line:prefer-const
 		let zipCode = userInfo.zipCode;

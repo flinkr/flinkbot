@@ -72,31 +72,12 @@ bot.dialog("/FAQAddress",
 
 bot.dialog("/GetZipCode",
 	(session, args) => {
-		let token = "BearereyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY2giLCJleHAiOjE1MTkwNzEwODUsImlhdCI6MTUxOTA2Mzg4NX0.h5sQsOdpztSGVasDWAjpmYrev_2WRf5HsfksgSv-udhdqtMIXT8p-FVLdswV7T06IQoqIGbg-fbSuHswJeCcLw"
-		flinkapi.getZipCode(token);
-
-
-
-
-		
-		// session.send(`Dies ist deine Postleitzahl:lakjflds`);
-		// (async () => {
-		// 	let zip = await flinkapi.getZipCode(session.userData.authToken);
-		// 	console.log("this is your zip code: " + zip);
-		// session.endDialog();
-
-		// })();
-
-
-		// (async () => {
-		// 	try {
-		// 		let zip = await flinkapi.getZipCode(session.userData.authToken);
-				session.send(`Dies ist deine Postleitzahl:`);
-				session.endDialog();
-		// 	} catch (err) {
-		// 		return err;
-		// 	}
-		// });
+		async function getZip() {
+			const zip = await flinkapi.getZipCode(session.userData.authToken);
+			session.send(`Dies ist deine Postleitzahl: ${zip}`);
+			session.endDialog();
+		}
+		getZip();
 	},
 ).triggerAction({
 	matches: "Meine PLZ",
