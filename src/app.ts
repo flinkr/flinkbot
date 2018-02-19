@@ -4,7 +4,7 @@ import * as dotenv from "dotenv";
 import * as restify from "restify";
 import * as flinkapi from "./flinkapi";
 
-let azure = require("botbuilder-azure");
+const azure = require("botbuilder-azure");
 dotenv.config();
 
 const documentDbOptions = {
@@ -38,9 +38,38 @@ const bot = new builder.UniversalBot(conn).set("storage", cosmosStorage);
 bot.recognizer(new builder.LuisRecognizer(LuisModelUrl));
 server.post("/api/messages", conn.listen());
 
-function getEntity(botbuilder: any, args: any, entity: string): string { 
+function getEntity(botbuilder: any, args: any, entity: string): string {
 	return botbuilder.EntityRecognizer.findEntity(args.intent.entities.entities);
 }
+
+bot.dialog("/Login", (session) => {
+	const msg = new builder.Message(session);
+	msg.attachmentLayout(builder.AttachmentLayout.carousel);
+	msg.attachments([
+		new builder.SigninCard(session)
+			.text("Bitte logge dich hier ein")
+			.button(
+				"Login", "http//:www.goflink.ch",
+			),
+		// new builder.HeroCard(session)
+		// 	.title("Classic White T-Shirt")
+		// 	.subtitle("100% Soft and Luxurious Cotton")
+		// 	.text("Price is $25 and carried in sizes (S, M, L, and XL)")
+		// 	.images([builder.CardImage.create(session, "http://petersapparel.parseapp.com/img/whiteshirt.png")])
+		// 	.buttons([
+		// 		builder.CardAction.imBack(session, "buy classic white t-shirt", "Buy"),
+		// 	]),
+		// new builder.HeroCard(session)
+		// 	.title("Classic Gray T-Shirt")
+		// 	.subtitle("100% Soft and Luxurious Cotton")
+		// 	.text("Price is $25 and carried in sizes (S, M, L, and XL)")
+		// 	.images([builder.CardImage.create(session, "http://petersapparel.parseapp.com/img/grayshirt.png")])
+		// 	.buttons([
+		// 		builder.CardAction.imBack(session, "buy classic gray t-shirt", "Buy"),
+		// 	]),
+	]);
+	session.send(msg).endDialog();
+}).triggerAction({ matches: "Login" });
 
 bot.dialog("/FAQAddress",
 	(session, args) => {
@@ -54,7 +83,8 @@ bot.dialog("/FAQAddress",
 
 bot.dialog("/CostsOfInsurance",
 	(session, args) => {
-		console.log("This is 3 log: "+JSON.stringify(args.intent.entities[0].type));
+		console.log("This is 3 log: " + JSON.stringify(args.intent.entities[0].type));
+		// tslint:disable-next-line:max-line-length
 		// console.log ("those are the entities found: " + builder.EntityRecognizer.findEntity(args.intent.entities[0], "Haftpflicht"));
 		session.send(`Deine Hausrat kostet 5 Franken`);
 		session.endDialog();
@@ -72,7 +102,6 @@ bot.dialog("/setUsername", [
 	(sess, result) => {
 		sess.userData.username = result.response;
 		sess.userData.name2 = "testname";
-		
 		sess.conversationData.testdata = "sessiondata";
 		sess.send(`Hallo, ${sess.userData.name2}`);
 		sess.endDialog();
@@ -81,15 +110,15 @@ bot.dialog("/setUsername", [
 	matches: "setUsername",
 });
 
-bot.dialog("/login", [
-	(sess, args, next) =>{
-		builder.Prompts.text(sess, "Hi, user, what is your authToken?")
-	},
-	(sess, result) => {
-		sess.userData.authToken = result.response;
-		sess.endDialog();
-	},
-]);
+// bot.dialog("/login", [
+// 	(sess, args, next) => {
+// 		builder.Prompts.text(sess, "Hi, user, what is your authToken?");
+// 	},
+// 	(sess, result) => {
+// 		sess.userData.authToken = result.response;
+// 		sess.endDialog();
+// 	},
+// ]);
 
 bot.dialog("/", [
 	(sess, args, next) => {
