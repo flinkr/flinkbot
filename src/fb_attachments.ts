@@ -16,7 +16,7 @@ export function fbWebviewLogin(userId: string): object {
 							buttons: [
 								{
 									type: "web_url",
-									url: `https://flinkbot-webview-win.azurewebsites.net/login?userId=2105307782829421`,
+									url: `https://flinkbot-webview-win.azurewebsites.net/login?2105307782829421`,
 									title: "Login",
 									webview_height_ratio: "compact",
 									messenger_extensions: true,
