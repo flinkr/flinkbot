@@ -50,7 +50,7 @@ bot.dialog("/Login", (session) => {
 	const msg = new builder.Message(session).sourceEvent({
 		facebook: {
 			// format according to channel's requirements
-			// (in our case, the above JSON required by Facebook)
+			// https://github.com/Microsoft/BotBuilder-Samples/blob/master/Node/blog-customChannelData/app.js
 			// https://developers.facebook.com/docs/messenger-platform/reference/buttons/url
 			attachment: {
 				type: "template",
@@ -58,14 +58,15 @@ bot.dialog("/Login", (session) => {
 					template_type: "generic",
 					elements: [
 						{
-							title: "This is title",
-							subtitle: "This is subtitle",
+							title: "Bitte bei Flink einloggen",
+							// subtitle: "This is subtitle",
 							buttons: [
 								{
 									type: "web_url",
 									url: "https://www.goflink.ch",
-									title: "This is title inside of webview",
+									title: "Login",
 									webview_height_ratio: "compact",
+									"messenger_extensions": true,
 								},
 							],
 						},
