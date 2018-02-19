@@ -19,7 +19,7 @@ export function fbWebviewLogin(): object {
 									url: "https://www.goflink.ch",
 									title: "Login",
 									webview_height_ratio: "compact",
-									"messenger_extensions": true,
+									// "messenger_extensions": true,
 								},
 							],
 						},
