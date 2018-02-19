@@ -8,14 +8,22 @@ export function fbWebviewLogin(): object {
 			attachment: {
 				type: "template",
 				payload: {
-					template_type: "button",
-					buttons: [{
-						type: "web_url",
-						url: "https://www.goflink.ch",
-						title: "Login",
-						webview_height_ratio: "compact",
-						messenger_extensions: true,
-					}],
+					template_type: "generic",
+					elements: [
+						{
+							title: "Bitte bei Flink einloggen",
+							// subtitle: "This is subtitle",
+							buttons: [
+								{
+									type: "web_url",
+									url: "https://www.goflink.ch",
+									title: "Login",
+									webview_height_ratio: "compact",
+									// "messenger_extensions": true,
+								},
+							],
+						},
+					],
 				},
 			},
 		},
