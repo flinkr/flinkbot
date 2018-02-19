@@ -2,8 +2,11 @@ import * as builder from "botbuilder";
 // import * as azure from "botbuilder-azure";
 import * as dotenv from "dotenv";
 import * as restify from "restify";
+import * as util from "util";
 import * as flinkapi from "./flinkapi";
+import facebookLoginWebview from "./fb_attachments";
 
+// tslint:disable-next-line:no-var-requires
 const azure = require("botbuilder-azure");
 dotenv.config();
 
@@ -43,33 +46,52 @@ function getEntity(botbuilder: any, args: any, entity: string): string {
 }
 
 bot.dialog("/Login", (session) => {
-	const msg = new builder.Message(session);
-	msg.attachmentLayout(builder.AttachmentLayout.carousel);
-	msg.attachments([
-		new builder.SigninCard(session)
-			.text("Bitte logge dich hier ein")
-			.button(
-				"Login", "https://www.goflink.ch",
-			),
-		// new builder.HeroCard(session)
-		// 	.title("Classic White T-Shirt")
-		// 	.subtitle("100% Soft and Luxurious Cotton")
-		// 	.text("Price is $25 and carried in sizes (S, M, L, and XL)")
-		// 	.images([builder.CardImage.create(session, "http://petersapparel.parseapp.com/img/whiteshirt.png")])
-		// 	.buttons([
-		// 		builder.CardAction.imBack(session, "buy classic white t-shirt", "Buy"),
-		// 	]),
-		// new builder.HeroCard(session)
-		// 	.title("Classic Gray T-Shirt")
-		// 	.subtitle("100% Soft and Luxurious Cotton")
-		// 	.text("Price is $25 and carried in sizes (S, M, L, and XL)")
-		// 	.images([builder.CardImage.create(session, "http://petersapparel.parseapp.com/img/grayshirt.png")])
-		// 	.buttons([
-		// 		builder.CardAction.imBack(session, "buy classic gray t-shirt", "Buy"),
-		// 	]),
-	]);
+	// construct a new message with the current session context
+	const msg = new builder.Message(session).sourceEvent({
+		facebook: {
+			// format according to channel's requirements
+			// (in our case, the above JSON required by Facebook)
+			attachment: {
+				type: "template",
+				payload: {
+					template_type: "generic",
+					elements: [
+						{
+							title: "Microsoft Bot Framework",
+							subtitle: "Check it out!",
+							buttons: [
+								{
+									type: "web_url",
+									url: "https://dev.botframework.com",
+									title: "Go to Dev Portal",
+								},
+								{
+									// this is our share button
+									type: "element_share",
+								},
+							],
+						},
+					],
+				},
+			}, // end of attachment
+		},
+	});
+
 	session.send(msg).endDialog();
 }).triggerAction({ matches: "Login" });
+
+// bot.dialog("/Login", (session) => {
+// 	const msg = new builder.Message(session);
+// 	msg.attachmentLayout(builder.AttachmentLayout.carousel);
+// 	msg.attachments([
+// 		new builder.SigninCard(session)
+// 			.text("Bitte logge dich hier ein")
+// 			.button(
+// 				"Login", "https://www.goflink.ch",
+// 			),
+// 	]);
+// 	session.send(msg).endDialog();
+// }).triggerAction({ matches: "Login" });
 
 bot.dialog("/FAQAddress",
 	(session, args) => {
