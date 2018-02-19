@@ -2,12 +2,9 @@
 // https://github.com/Microsoft/BotBuilder-Samples/blob/master/Node/blog-customChannelData/app.js
 // https://developers.facebook.com/docs/messenger-platform/reference/buttons/url
 
-export function facebookLoginWebview() {
+export function facebookLoginWebview(): object {
 	return {
 		facebook: {
-			// format according to channel's requirements
-			// https://github.com/Microsoft/BotBuilder-Samples/blob/master/Node/blog-customChannelData/app.js
-			// https://developers.facebook.com/docs/messenger-platform/reference/buttons/url
 			attachment: {
 				type: "template",
 				payload: {
