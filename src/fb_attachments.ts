@@ -2,7 +2,7 @@
 // https://github.com/Microsoft/BotBuilder-Samples/blob/master/Node/blog-customChannelData/app.js
 // https://developers.facebook.com/docs/messenger-platform/reference/buttons/url
 
-export function facebookLoginWebview(): object {
+export function fbWebviewLogin(): object {
 	return {
 		facebook: {
 			attachment: {

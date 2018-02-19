@@ -4,7 +4,7 @@ import * as dotenv from "dotenv";
 import * as restify from "restify";
 import * as util from "util";
 import * as flinkapi from "./flinkapi";
-import facebookLoginWebview from "./fb_attachments";
+import * as fb_attachments from "./fb_attachments";
 
 // tslint:disable-next-line:no-var-requires
 const azure = require("botbuilder-azure");
@@ -47,34 +47,7 @@ function getEntity(botbuilder: any, args: any, entity: string): string {
 
 bot.dialog("/Login", (session) => {
 	// construct a new message with the current session context
-	const msg = new builder.Message(session).sourceEvent({
-		facebook: {
-			// format according to channel's requirements
-			// https://github.com/Microsoft/BotBuilder-Samples/blob/master/Node/blog-customChannelData/app.js
-			// https://developers.facebook.com/docs/messenger-platform/reference/buttons/url
-			attachment: {
-				type: "template",
-				payload: {
-					template_type: "generic",
-					elements: [
-						{
-							title: "Bitte bei Flink einloggen",
-							// subtitle: "This is subtitle",
-							buttons: [
-								{
-									type: "web_url",
-									url: "https://www.goflink.ch",
-									title: "Login",
-									webview_height_ratio: "compact",
-									"messenger_extensions": true,
-								},
-							],
-						},
-					],
-				},
-			}, // end of attachment
-		},
-	});
+	const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewLogin);
 
 	session.send(msg).endDialog();
 }).triggerAction({ matches: "Login" });
