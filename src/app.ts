@@ -58,13 +58,13 @@ bot.dialog("/Login", (session) => {
 					template_type: "generic",
 					elements: [
 						{
-							title: "Microsoft Bot Framework",
-							subtitle: "Check it out!",
+							title: "This is title",
+							subtitle: "This is subtitle",
 							buttons: [
 								{
 									type: "web_url",
-									url: "https://dev.botframework.com",
-									title: "Go to Dev Portal",
+									url: "https://www.goflink.ch",
+									title: "This is title inside of webview",
 									webview_height_ratio: "compact",
 								},
 							],
