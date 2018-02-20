@@ -70,6 +70,16 @@ bot.dialog("/FAQAddress",
 	matches: "FAQ: Adresse von Flink",
 });
 
+bot.dialog("/Hallo",
+	(session, args) => {
+		// logIntents(args);
+		session.send(`Hallo, wie kann ich helfen?`);
+		session.endDialog();
+	},
+).triggerAction({
+	matches: "Hallo",
+});
+
 bot.dialog("/GetZipCode",
 	(session, args) => {
 	if(!session.userData.authToken){
