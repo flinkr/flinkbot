@@ -100,16 +100,16 @@ bot.dialog("/CostsOfInsurance",
 });
 
 bot.dialog("/setUsername", [
-	(sess, args, next) => {
-		builder.Prompts.text(sess, "Hi, user, what is your Username?");
+	(session, args, next) => {
+		builder.Prompts.text(session, "Hi, user, what is your Username?");
 		// next();
 	},
-	(sess, result) => {
-		sess.userData.username = result.response;
-		sess.userData.name2 = "testname";
-		sess.conversationData.testdata = "sessiondata";
-		sess.send(`Hallo, ${sess.userData.name2}`);
-		sess.endDialog();
+	(session, result) => {
+		session.userData.username = result.response;
+		session.userData.name2 = "testname";
+		session.conversationData.testdata = `this is the username in the session ${session.userData.username}`;
+		session.send(`Hallo, ${session.userData.username}`);
+		session.endDialog();
 	},
 ]).triggerAction({
 	matches: "setUsername",
