@@ -72,6 +72,9 @@ bot.dialog("/FAQAddress",
 
 bot.dialog("/GetZipCode",
 	(session, args) => {
+	if(!session.userData.authToken){
+		session.replaceDialog("/Login");
+	}	
 		async function getZip() {
 			const zip = await flinkapi.getZipCode(session.userData.authToken);
 			session.send(`Dies ist deine Postleitzahl: ${zip}`);
@@ -81,7 +84,6 @@ bot.dialog("/GetZipCode",
 	},
 ).triggerAction({
 	matches: "Meine PLZ",
-
 });
 
 bot.dialog("/CostsOfInsurance",
