@@ -127,15 +127,6 @@ bot.dialog("/setUsername", [
 	matches: "setUsername",
 });
 
-// bot.dialog("/login", [
-// 	(sess, args, next) => {
-// 		builder.Prompts.text(sess, "Hi, user, what is your authToken?");
-// 	},
-// 	(sess, result) => {
-// 		sess.userData.authToken = result.response;
-// 		sess.endDialog();
-// 	},
-// ]);
 
 bot.dialog("/", [
 	(sess, args, next) => {
@@ -149,14 +140,25 @@ bot.dialog("/", [
 
 
 
-bot.dialog("/claim", [
-
-	(sess, args, next) => {
-		builder.Prompts.text(sess, "Hi, how can i help you?");
+bot.dialog("/Schaden melden", [
+	(session, args, next) => {
+		var msg = new builder.Message(session)
+		.text("Um welche Art von Schaden handelt es sich?")
+		.suggestedActions(
+			builder.SuggestedActions.create(
+					session, [
+						builder.CardAction.imBack(session, "productId=1&color=green", "Green"),
+						builder.CardAction.imBack(session, "productId=1&color=blue", "Blue"),
+						builder.CardAction.imBack(session, "productId=1&color=red", "Red")
+					]
+				));
+		session.send(msg);
 	},
-	(sess, result) => {
-		sess.userData.name = result.response;
-		sess.endDialog();
+	(session, result) => {
+		session.userData.name = result.response;
+		session.endDialog();
 	},
-]);
+]).triggerAction({
+	matches: "Schaden melden",
+});
 
