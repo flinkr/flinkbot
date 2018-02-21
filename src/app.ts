@@ -145,7 +145,7 @@ bot.dialog("/Schaden melden", [
 		// prompt for search option
 		builder.Prompts.choice(
 			session, 'Um welche Art von Schaden handelt es sich?',
-			["bli", "bla"],
+			["Sachen von jemand anderem beschädigt", "Schaden an Mietwohnung", "Ich habe jemanden verletzt"],
 			{
 				maxRetries: 3,
 				retryPrompt: 'Not a valid option',
@@ -166,7 +166,7 @@ bot.dialog("/Schaden melden", [
 		// prompt for search option
 		builder.Prompts.choice(
 			session, 'Was ist passiert? Style 3',
-			["bli", "bla"],
+			["Sachen von jemand anderem beschädigt", "Schaden an Mietwohnung", "Ich habe jemanden verletzt"],
 			{
 				maxRetries: 3,
 				retryPrompt: 'Not a valid option',
