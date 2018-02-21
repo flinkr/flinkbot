@@ -82,15 +82,17 @@ bot.dialog("/Hallo",
 
 bot.dialog("/GetZipCode",
 	(session, args) => {
-	if(!session.userData.authToken){
-		session.replaceDialog("/Login");
-	}	
+		if (!session.userData.authToken) {
+			session.beginDialog("/Login");
+		} else {
+			getZip();
+		}
 		async function getZip() {
 			const zip = await flinkapi.getZipCode(session.userData.authToken);
 			session.send(`Dies ist deine Postleitzahl: ${zip}`);
 			session.endDialog();
 		}
-		getZip();
+		
 	},
 ).triggerAction({
 	matches: "Meine PLZ",
@@ -144,3 +146,17 @@ bot.dialog("/", [
 		sess.endDialog();
 	},
 ]);
+
+
+
+bot.dialog("/claim", [
+
+	(sess, args, next) => {
+		builder.Prompts.text(sess, "Hi, how can i help you?");
+	},
+	(sess, result) => {
+		sess.userData.name = result.response;
+		sess.endDialog();
+	},
+]);
+
