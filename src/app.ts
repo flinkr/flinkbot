@@ -92,7 +92,7 @@ bot.dialog("/GetZipCode",
 			session.send(`Dies ist deine Postleitzahl: ${zip}`);
 			session.endDialog();
 		}
-		
+
 	},
 ).triggerAction({
 	matches: "Meine PLZ",
@@ -142,20 +142,33 @@ bot.dialog("/", [
 
 bot.dialog("/Schaden melden", [
 	(session, args, next) => {
+		// prompt for search option
+		builder.Prompts.choice(
+			session, 'Are you looking for a flight or a hotel?',
+			["bli", "bla"],
+			{
+				maxRetries: 3,
+				retryPrompt: 'Not a valid option'
+			});
+	},	
+	(session, args, next) => {
 		var msg = new builder.Message(session)
-		.text("Um welche Art von Schaden handelt es sich?")
-		.suggestedActions(
-			builder.SuggestedActions.create(
-					session, [
-						builder.CardAction.imBack(session, "productId=1&color=green", "Green"),
-						builder.CardAction.imBack(session, "productId=1&color=blue", "Blue"),
-						builder.CardAction.imBack(session, "productId=1&color=red", "Red")
-					]
+			.text("Um welche Art von Schaden handelt es sich?")
+			.suggestedActions(
+				builder.SuggestedActions.create(session, [
+					builder.CardAction.imBack(session, "Ich habe die Sachen von jemand anderem beschädigt", "Sachen von jemand anderem beschädigt"),
+					builder.CardAction.imBack(session, "Ich habe etwas in der Mietwohnung kaputtgemacht", "Schaden an Mietwohnung"),
+					builder.CardAction.imBack(session, "Mir wurde etwas gestohlen", "Diebstahl"),
+					builder.CardAction.imBack(session, "Ich habe jemanden verletzt", "Ich habe jemanden verletzt"),
+					builder.CardAction.imBack(session, "Etwas von mir wurde beschädigt", "Etwas von mir ist Beschädigt")
+				]
 				));
 		session.send(msg);
+
+		
 	},
 	(session, result) => {
-		session.userData.name = result.response;
+		session.send(`Ok, deine wahl war, ${result}`);
 		session.endDialog();
 	},
 ]).triggerAction({
