@@ -144,13 +144,46 @@ bot.dialog("/Schaden melden", [
 	(session, args, next) => {
 		// prompt for search option
 		builder.Prompts.choice(
-			session, 'Are you looking for a flight or a hotel?',
+			session, 'Um welche Art von Schaden handelt es sich?',
 			["bli", "bla"],
 			{
 				maxRetries: 3,
-				retryPrompt: 'Not a valid option'
+				retryPrompt: 'Not a valid option',
+			});
+	},
+	(session, args, next) => {
+		// prompt for search option
+		builder.Prompts.choice(
+			session, 'Was ist passiert? No style',
+			["Sachen von jemand anderem beschädigt", "Schaden an Mietwohnung", "Ich habe jemanden verletzt"],
+			{
+				maxRetries: 3,
+				retryPrompt: 'Not a valid option',
+				listStyle: 4
 			});
 	},	
+	(session, args, next) => {
+		// prompt for search option
+		builder.Prompts.choice(
+			session, 'Was ist passiert? Style 3',
+			["bli", "bla"],
+			{
+				maxRetries: 3,
+				retryPrompt: 'Not a valid option',
+				listStyle: 3
+			});
+	},
+	(session, args, next) => {
+		// prompt for search option
+		builder.Prompts.choice(
+			session, 'Was ist passiert? Style 2',
+			["bli", "bla"],
+			{
+				maxRetries: 3,
+				retryPrompt: 'Not a valid option',
+				listStyle: 2
+			});
+	},			
 	(session, args, next) => {
 		var msg = new builder.Message(session)
 			.text("Um welche Art von Schaden handelt es sich?")
