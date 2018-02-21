@@ -154,12 +154,12 @@ bot.dialog("/Schaden melden", [
 	(session, args, next) => {
 		// prompt for search option
 		builder.Prompts.choice(
-			session, 'Was ist passiert? No style',
+			session, 'Was ist passiert? Style 3:buttons',
 			["Sachen von jemand anderem beschädigt", "Schaden an Mietwohnung", "Ich habe jemanden verletzt"],
 			{
 				maxRetries: 3,
 				retryPrompt: 'Not a valid option',
-				listStyle: 4
+				listStyle: 3
 			});
 	},	
 	(session, args, next) => {
@@ -176,12 +176,12 @@ bot.dialog("/Schaden melden", [
 	(session, args, next) => {
 		// prompt for search option
 		builder.Prompts.choice(
-			session, 'Was ist passiert? Style 2',
+			session, 'Was ist passiert? Style 4:auto',
 			["bli", "bla"],
 			{
 				maxRetries: 3,
 				retryPrompt: 'Not a valid option',
-				listStyle: 2
+				listStyle: 4
 			});
 	},			
 	(session, args, next) => {
