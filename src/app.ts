@@ -37,6 +37,7 @@ const conn = new builder.ChatConnector({
 });
 
 const LuisModelUrl = process.env.LUIS_MODEL_URL;
+const EnglishLuisModelUrl = process.env.LUIS_MODEL_URL_ENGLISH_ENTITIES;
 const bot = new builder.UniversalBot(conn).set("storage", cosmosStorage);
 bot.recognizer(new builder.LuisRecognizer(LuisModelUrl));
 server.post("/api/messages", conn.listen());
@@ -139,7 +140,6 @@ bot.dialog("/", [
 ]);
 
 
-
 bot.dialog("/Schaden melden", [
 	(session, args, next) => {
 		// prompt for search option
@@ -150,41 +150,21 @@ bot.dialog("/Schaden melden", [
 				maxRetries: 3,
 				retryPrompt: 'Not a valid option',
 			});
+			
 	},
-	(session, args, next) => {
+	(session, result) => {
+		session.userData.damage.type = result;
 		// prompt for search option
-		builder.Prompts.choice(
-			session, 'Was ist passiert? Style 3:buttons',
-			["Sachen von jemand anderem beschädigt", "Schaden an Mietwohnung", "Ich habe jemanden verletzt"],
-			{
-				maxRetries: 3,
-				retryPrompt: 'Not a valid option',
-				listStyle: 3
-			});
-	},	
-	(session, args, next) => {
-		// prompt for search option
-		builder.Prompts.choice(
-			session, 'Was ist passiert? Style 3',
-			["Sachen von jemand anderem beschädigt", "Schaden an Mietwohnung", "Ich habe jemanden verletzt"],
-			{
-				maxRetries: 3,
-				retryPrompt: 'Not a valid option',
-				listStyle: 3
-			});
+		builder.Prompts.text(
+			session, 'An welchem Datum ist es passiert')
 	},
-	(session, args, next) => {
+	(session, result) => {
+		var time = builder.EntityRecognizer.findEntity(result.entities, 'builtin.datetime');
 		// prompt for search option
-		builder.Prompts.choice(
-			session, 'Was ist passiert? Style 4:auto',
-			["bli", "bla"],
-			{
-				maxRetries: 3,
-				retryPrompt: 'Not a valid option',
-				listStyle: 4
-			});
+		builder.Prompts.text(
+			session, 'An welchem Datum ist es passiert')
 	},			
-	(session, args, next) => {
+	(session, result) => {
 		var msg = new builder.Message(session)
 			.text("Um welche Art von Schaden handelt es sich?")
 			.suggestedActions(
@@ -208,3 +188,23 @@ bot.dialog("/Schaden melden", [
 	matches: "Schaden melden",
 });
 
+// If you want to match manual witout luis
+// bot.recognizer(new builder.RegExpRecognizer( "CancelIntent", { en_us: /^(cancel|nevermind)/i, ja_jp: /^(キャンセル)/ }));
+
+bot.dialog("/testDateInput", [
+	(session, args, next) => {
+		builder.Prompts.text(session, "Hi, user, what is your Birthday?");
+		// next();
+	},
+	(session, result) => {
+		builder.LuisRecognizer.recognize(session.message.text, EnglishLuisModelUrl, (err, intents, entities) => {
+			console.log(`This is your entity, ${JSON.stringify(entities)}`);
+			let entity = entities;
+			console.log(entities[0].resolution.values[0].value)
+		})
+		
+		session.endDialog();
+	}
+]).triggerAction({
+	matches: "setBirthday",
+});
