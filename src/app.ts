@@ -225,22 +225,7 @@ bot.dialog("/testDateInput", [
 
 
 
-bot.dialog("/testDateInput", [
-	(session, args, next) => {
-		builder.Prompts.text(session, "Hi, user, what is your Birthday?");
-		// next();
-	},
-	(session, result) => {
-		builder.LuisRecognizer.recognize(session.message.text, EnglishLuisModelUrl, (err, intents, entities) => {
-			console.log(`This is your entity, ${JSON.stringify(entities)}`);
-			let entity = entities;
-			console.log((entities as any)[0].resolution.values[0].value)
-		})
-		session.endDialog();
-	}
-]).triggerAction({
-	matches: "setBirthday",
-});
+
 
 
 // bot.on("event", function (event) {
