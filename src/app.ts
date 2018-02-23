@@ -73,9 +73,13 @@ bot.dialog("/FAQAddress",
 
 bot.dialog("/Hallo",
 	(session, args) => {
+		bot.on("event", function (event) {
+			console.log("Event received!! This is the event"+JSON.stringify(event));
+			session.send(`Yo, ich habe auf deine Nachricht reagiert`);
+		})
 		// logIntents(args);
-		session.send(`Hallo, wie kann ich helfen?`);
-		session.endDialog();
+		// session.send(`Hallo, wie kann ich helfen?`);
+		// session.endDialog();
 	},
 ).triggerAction({
 	matches: "Hallo",
@@ -220,12 +224,31 @@ bot.dialog("/testDateInput", [
 });
 
 
-bot.on("event", function (event) {
-	console.log("Event received!! This is the event"+event)
-    // var msg = new builder.Message().address(event.address);
-    // msg.data.textLocale = "en-us";
-    // if (event.name === "buttonClicked") {
-    //     msg.data.text = "I see that you clicked a button.";
-    // }
-    // bot.send(msg);
-})
+
+bot.dialog("/testDateInput", [
+	(session, args, next) => {
+		builder.Prompts.text(session, "Hi, user, what is your Birthday?");
+		// next();
+	},
+	(session, result) => {
+		builder.LuisRecognizer.recognize(session.message.text, EnglishLuisModelUrl, (err, intents, entities) => {
+			console.log(`This is your entity, ${JSON.stringify(entities)}`);
+			let entity = entities;
+			console.log((entities as any)[0].resolution.values[0].value)
+		})
+		session.endDialog();
+	}
+]).triggerAction({
+	matches: "setBirthday",
+});
+
+
+// bot.on("event", function (event) {
+// 	console.log("Event received!! This is the event"+JSON.stringify(event));
+//     var msg = new builder.Message().address(event.address);
+//     msg.data.textLocale = "en-us";
+//     if (event.name === "buttonClicked") {
+//         msg.data.text = "I see that you clicked a button.";
+//     }
+//     bot.send(msg);
+// })
