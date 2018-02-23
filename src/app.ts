@@ -165,17 +165,10 @@ bot.dialog("/Schaden melden", [
 			// console.log((entities as any)[0].resolution.values[0].value);
 			session.userData.damage_date = (entities as any)[0].resolution.values[0].value;
 		})
-		builder.Prompts.text(session, `Ok, am ${session.userData.damage_date} ist ein schaden vom typ ${session.userData.damage_type} passiert. Dies ist die nächste Frage?`);
+		session.send(`Ok, am ${session.userData.damage_date} ist ein schaden vom typ ${session.userData.damage_type} passiert. Dies ist die nächste Frage?`);
+		// builder.Prompts.text(session, `Ok, am ${session.userData.damage_date} ist ein schaden vom typ ${session.userData.damage_type} passiert. Dies ist die nächste Frage?`);
 	},
 	(session, result) => {
-		builder.LuisRecognizer.recognize(session.message.text, EnglishLuisModelUrl, (err, intents, entities) => {
-			// console.log(`This is your entity, ${JSON.stringify(entities)}`);
-			let entity = entities;
-			// console.log((entities as any)[0].resolution.values[0].value);
-			session.userData.damage_date = (entities as any)[0].resolution.values[0].value;
-		})
-		builder.Prompts.text(session, `Ok, am ${session.userData.damage_date} ist ein schaden vom typ ${session.userData.damage_type} passiert. Dies ist die nächste Frage?`);
-
 		// construct a new message with the current session context
 		const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewLogin(session.message.user.id));
 		session.send(msg).endDialog();
