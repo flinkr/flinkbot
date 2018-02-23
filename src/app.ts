@@ -149,37 +149,64 @@ bot.dialog("/Schaden melden", [
 			{
 				maxRetries: 3,
 				retryPrompt: 'Not a valid option',
+				listStyle: 3 
 			});
-			
 	},
 	(session, result) => {
-		session.userData.damage.type = result;
+		// console.log(`this is the damage type: ${result.response}`)
+		session.userData.damage_type = result.response.entity;
 		// prompt for search option
-		builder.Prompts.text(
-			session, 'An welchem Datum ist es passiert')
+		builder.Prompts.text(session, 'An welchem Datum ist es passiert?');
 	},
 	(session, result) => {
-		var time = builder.EntityRecognizer.findEntity(result.entities, 'builtin.datetime');
-		// prompt for search option
-		builder.Prompts.text(
-			session, 'An welchem Datum ist es passiert')
-	},			
+		builder.LuisRecognizer.recognize(session.message.text, EnglishLuisModelUrl, (err, intents, entities) => {
+			// console.log(`This is your entity, ${JSON.stringify(entities)}`);
+			let entity = entities;
+			// console.log((entities as any)[0].resolution.values[0].value);
+			session.userData.damage_date = (entities as any)[0].resolution.values[0].value;
+		})
+		builder.Prompts.text(session, `Ok, am ${session.userData.damage_date} ist ein schaden vom typ ${session.userData.damage_type} passiert. Dies ist die nächste Frage?`);
+	},
 	(session, result) => {
-		var msg = new builder.Message(session)
-			.text("Um welche Art von Schaden handelt es sich?")
-			.suggestedActions(
-				builder.SuggestedActions.create(session, [
-					builder.CardAction.imBack(session, "Ich habe die Sachen von jemand anderem beschädigt", "Sachen von jemand anderem beschädigt"),
-					builder.CardAction.imBack(session, "Ich habe etwas in der Mietwohnung kaputtgemacht", "Schaden an Mietwohnung"),
-					builder.CardAction.imBack(session, "Mir wurde etwas gestohlen", "Diebstahl"),
-					builder.CardAction.imBack(session, "Ich habe jemanden verletzt", "Ich habe jemanden verletzt"),
-					builder.CardAction.imBack(session, "Etwas von mir wurde beschädigt", "Etwas von mir ist Beschädigt")
-				]
-				));
-		session.send(msg);
+		builder.LuisRecognizer.recognize(session.message.text, EnglishLuisModelUrl, (err, intents, entities) => {
+			// console.log(`This is your entity, ${JSON.stringify(entities)}`);
+			let entity = entities;
+			// console.log((entities as any)[0].resolution.values[0].value);
+			session.userData.damage_date = (entities as any)[0].resolution.values[0].value;
+		})
+		builder.Prompts.text(session, `Ok, am ${session.userData.damage_date} ist ein schaden vom typ ${session.userData.damage_type} passiert. Dies ist die nächste Frage?`);
 
-		
+		// construct a new message with the current session context
+		const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewLogin(session.message.user.id));
+		session.send(msg).endDialog();
+
+
+
 	},
+
+
+
+
+	
+	
+
+
+	// (session, result) => {
+	// 	var msg = new builder.Message(session)
+	// 		.text("Um welche Art von Schaden handelt es sich?")
+	// 		.suggestedActions(
+	// 			builder.SuggestedActions.create(session, [
+	// 				builder.CardAction.imBack(session, "Ich habe die Sachen von jemand anderem beschädigt", "Sachen von jemand anderem beschädigt"),
+	// 				builder.CardAction.imBack(session, "Ich habe etwas in der Mietwohnung kaputtgemacht", "Schaden an Mietwohnung"),
+	// 				builder.CardAction.imBack(session, "Mir wurde etwas gestohlen", "Diebstahl"),
+	// 				builder.CardAction.imBack(session, "Ich habe jemanden verletzt", "Ich habe jemanden verletzt"),
+	// 				builder.CardAction.imBack(session, "Etwas von mir wurde beschädigt", "Etwas von mir ist Beschädigt")
+	// 			]
+	// 			));
+	// 	session.send(msg);
+
+
+	// },
 	(session, result) => {
 		session.send(`Ok, deine wahl war, ${result}`);
 		session.endDialog();
@@ -200,9 +227,8 @@ bot.dialog("/testDateInput", [
 		builder.LuisRecognizer.recognize(session.message.text, EnglishLuisModelUrl, (err, intents, entities) => {
 			console.log(`This is your entity, ${JSON.stringify(entities)}`);
 			let entity = entities;
-			console.log(entities[0].resolution.values[0].value)
+			console.log((entities as any)[0].resolution.values[0].value)
 		})
-		
 		session.endDialog();
 	}
 ]).triggerAction({

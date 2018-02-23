@@ -30,6 +30,35 @@ export function fbWebviewLogin(userId: string): object {
 	};
 }
 
+
+export function fbWebviewClaimObjects(userId: string): object {
+	return {
+		facebook: {
+			attachment: {
+				type: "template",
+				payload: {
+					template_type: "generic",
+					elements: [
+						{
+							title: "Bitte hier klicken um die Details einzutragen:",
+							// subtitle: "This is subtitle",
+							buttons: [
+								{
+									type: "web_url",
+									url: `https://flinkbot-webview-win.azurewebsites.net/claimObjects?${userId}`,
+									title: "Los geht's",
+									webview_height_ratio: "compact",
+									messenger_extensions: true,
+								},
+							],
+						},
+					],
+				},
+			},
+		},
+	};
+}
+
 // bot.dialog("/Login", (session) => {
 // 	const msg = new builder.Message(session);
 // 	msg.attachmentLayout(builder.AttachmentLayout.carousel);
