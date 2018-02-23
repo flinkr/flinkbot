@@ -158,7 +158,7 @@ bot.dialog("/Schaden melden", [
 		// prompt for search option
 		builder.Prompts.text(session, 'An welchem Datum ist es passiert?');
 	},
-	(session, result) => {
+	(session, result, next) => {
 		builder.LuisRecognizer.recognize(session.message.text, EnglishLuisModelUrl, (err, intents, entities) => {
 			console.log(`This is your entity, ${JSON.stringify(entities)}`);
 			let entity = entities;
@@ -166,20 +166,14 @@ bot.dialog("/Schaden melden", [
 			session.userData.damage_date = (entities as any)[0].resolution.values[0].value;
 		})
 		session.send(`Ok, am ${session.userData.damage_date} ist ein schaden vom typ ${session.userData.damage_type} passiert. Dies ist die nächste Frage?`);
-		// builder.Prompts.text(session, `Ok, am ${session.userData.damage_date} ist ein schaden vom typ ${session.userData.damage_type} passiert. Dies ist die nächste Frage?`);
+		next();// builder.Prompts.text(session, `Ok, am ${session.userData.damage_date} ist ein schaden vom typ ${session.userData.damage_type} passiert. Dies ist die nächste Frage?`);
 	},
 	(session, result) => {
 		// construct a new message with the current session context
 		const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewLogin(session.message.user.id));
-		session.send(msg).endDialog();
+		session.send(msg);
+		
 	},
-
-
-
-
-	
-	
-
 
 	// (session, result) => {
 	// 	var msg = new builder.Message(session)
@@ -224,3 +218,14 @@ bot.dialog("/testDateInput", [
 ]).triggerAction({
 	matches: "setBirthday",
 });
+
+
+bot.on("event", function (event) {
+	console.log("Event received!! This is the event"+event)
+    // var msg = new builder.Message().address(event.address);
+    // msg.data.textLocale = "en-us";
+    // if (event.name === "buttonClicked") {
+    //     msg.data.text = "I see that you clicked a button.";
+    // }
+    // bot.send(msg);
+})
