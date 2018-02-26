@@ -5,7 +5,6 @@ import * as restify from "restify";
 import * as util from "util";
 import * as flinkapi from "./flinkapi";
 import * as fb_attachments from "./fb_attachments";
-
 // tslint:disable-next-line:no-var-requires
 const azure = require("botbuilder-azure");
 dotenv.config();
@@ -16,7 +15,6 @@ const documentDbOptions = {
 	database: process.env.COSMOS_DATABASE,
 	collection: process.env.COSMOS_COLLECTION,
 };
-
 const docDbClient = new azure.DocumentDbClient(documentDbOptions);
 const cosmosStorage = new azure.AzureBotStorage({ gzipData: false }, docDbClient);
 
@@ -25,17 +23,14 @@ function logIntents(args: any): void {
 	console.log(args.intent.intent);
 	console.log(args.intent.entities);
 }
-
 const server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, () => {
 	console.log(`listening...${server.name}... ${server.url}`);
 });
-
 const conn = new builder.ChatConnector({
 	appId: process.env.MICROSOFT_APP_ID,
 	appPassword: process.env.MICROSOFT_APP_PASSWORD,
 });
-
 const LuisModelUrl = process.env.LUIS_MODEL_URL;
 const EnglishLuisModelUrl = process.env.LUIS_MODEL_URL_ENGLISH_ENTITIES;
 const bot = new builder.UniversalBot(conn).set("storage", cosmosStorage);
@@ -46,23 +41,18 @@ function getEntity(botbuilder: any, args: any, entity: string): string {
 	return botbuilder.EntityRecognizer.findEntity(args.intent.entities.entities);
 }
 
-// bot.dialog("/getId", (session) => {
-// 	// construct a new message with the current session context
-// 	console.log("This is the userdata: " + JSON.stringify(session.userData));
-// 	console.log("This is the username: " + session.userData.username);
-// 	let userId = session.message.user.id;
-// 	session.send(`Your Id is: ${userId}`);
-// }).triggerAction({ matches: "print id" });
+
+
+
 
 bot.dialog("/Login", (session) => {
 	// construct a new message with the current session context
 	const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewLogin(session.message.user.id));
 	session.send(msg);
 	bot.on("event", function (event) {
-		console.log("Event received!! This is the event"+JSON.stringify(event));
+		console.log("Event received!! This is the event" + JSON.stringify(event));
 		session.send(`Erfolgreich bei Flink eingeloggt!`).endDialog();
 	})
-	
 }).triggerAction({ matches: "Login" });
 
 bot.dialog("/FAQAddress",
@@ -71,9 +61,7 @@ bot.dialog("/FAQAddress",
 		session.send(`The address is Bahnhofstrasse 5!`);
 		session.endDialog();
 	},
-).triggerAction({
-	matches: "FAQ: Adresse von Flink",
-});
+).triggerAction({matches: "FAQ: Adresse von Flink" });
 
 bot.dialog("/Hallo",
 	(session, args) => {
@@ -86,9 +74,7 @@ bot.dialog("/Hallo",
 		session.send(`Hallo, wie kann ich helfen?`);
 		session.endDialog();
 	},
-).triggerAction({
-	matches: "Hallo",
-});
+).triggerAction({ matches: "Hallo" });
 
 bot.dialog("/GetZipCode",
 	(session, args) => {
@@ -98,7 +84,7 @@ bot.dialog("/GetZipCode",
 		}
 		if (session.userData.authToken) {
 			getZip();
-		}	
+		}
 		async function getZip() {
 			const zip = await flinkapi.getZipCode(session.userData.authToken);
 			session.send(`Dies ist deine Postleitzahl: ${zip}`);
@@ -106,9 +92,7 @@ bot.dialog("/GetZipCode",
 		}
 
 	},
-).triggerAction({
-	matches: "Meine PLZ",
-});
+).triggerAction({ matches: "Meine PLZ" });
 
 bot.dialog("/CostsOfInsurance",
 	(session, args) => {
@@ -118,10 +102,7 @@ bot.dialog("/CostsOfInsurance",
 		session.send(`Deine Hausrat kostet 5 Franken`);
 		session.endDialog();
 	},
-).triggerAction({
-	matches: "Was kostet meine Versicherung?",
-
-});
+).triggerAction({ matches: "Was kostet meine Versicherung?" });
 
 bot.dialog("/setUsername", [
 	(session, args, next) => {
@@ -135,10 +116,7 @@ bot.dialog("/setUsername", [
 		session.send(`Hallo, ${session.userData.username}`);
 		session.endDialog();
 	},
-]).triggerAction({
-	matches: "setUsername",
-});
-
+]).triggerAction({ matches: "setUsername" });
 
 bot.dialog("/", [
 	(sess, args, next) => {
@@ -150,7 +128,6 @@ bot.dialog("/", [
 	},
 ]);
 
-
 bot.dialog("/Schaden melden", [
 	(session, args, next) => {
 		// prompt for search option
@@ -160,7 +137,7 @@ bot.dialog("/Schaden melden", [
 			{
 				maxRetries: 3,
 				retryPrompt: 'Not a valid option',
-				listStyle: 3 
+				listStyle: 3
 			});
 	},
 	(session, result) => {
@@ -183,7 +160,7 @@ bot.dialog("/Schaden melden", [
 		// construct a new message with the current session context
 		const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewLogin(session.message.user.id));
 		session.send(msg);
-		
+
 	},
 
 	// (session, result) => {
@@ -206,12 +183,7 @@ bot.dialog("/Schaden melden", [
 		session.send(`Ok, deine wahl war, ${result}`);
 		session.endDialog();
 	},
-]).triggerAction({
-	matches: "Schaden melden",
-});
-
-// If you want to match manual witout luis
-// bot.recognizer(new builder.RegExpRecognizer( "CancelIntent", { en_us: /^(cancel|nevermind)/i, ja_jp: /^(キャンセル)/ }));
+]).triggerAction({ matches: "Schaden melden" });
 
 bot.dialog("/testDateInput", [
 	(session, args, next) => {
@@ -226,34 +198,28 @@ bot.dialog("/testDateInput", [
 		})
 		session.endDialog();
 	}
-]).triggerAction({
-	matches: "setBirthday",
-});
+]).triggerAction({ matches: "setBirthday" });
 
-
-
-// The dialog stack is cleared and this dialog is invoked when the user enters 'help'.
 bot.dialog('/test', function (session, args, next) {
 	session.send("OK the dialog beginns <br/> now");
 	session.beginDialog("/help");
 	session.send("This should be the last message").endDialog();
-})
-.triggerAction({
-    matches: "testDialog",
-});
-// The dialog stack is cleared and this dialog is invoked when the user enters 'help'.
+}).triggerAction({ matches: "testDialog" });
+
 bot.dialog('/help', function (session, args, next) {
 	session.send("2");
 	bot.on("event", function (event) {
-		console.log("Event received!! This is the event"+JSON.stringify(event));
+		console.log("Event received!! This is the event" + JSON.stringify(event));
 		session.send(`Erfolgreich bei Flink eingeloggt!`).endDialog();
 	})
-	
-	// setTimeout(function(){session.send("This the help dialog without onselectaction <br/> Bla");}, 10000);
-})
-.triggerAction({
-    matches: "testRoute",
-});
+}).triggerAction({ matches: "testRoute" });
+
+
+
+
+
+
+
 // bot.dialog('/helpwithOnSelect', function (session, args, next) {
 //     session.endDialog("This is with onselectaction");
 // })
