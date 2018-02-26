@@ -95,9 +95,10 @@ bot.dialog("/GetZipCode",
 		if (!session.userData.authToken) {
 			session.beginDialog("/Login");
 			session.send("returnes to getzipcode")
-		} else {
-			getZip();
 		}
+		if (session.userData.authToken) {
+			getZip();
+		}	
 		async function getZip() {
 			const zip = await flinkapi.getZipCode(session.userData.authToken);
 			session.send(`Dies ist deine Postleitzahl: ${zip}`);
@@ -242,13 +243,17 @@ bot.dialog('/test', function (session, args, next) {
 });
 // The dialog stack is cleared and this dialog is invoked when the user enters 'help'.
 bot.dialog('/help', function (session, args, next) {
-	setTimeout(function(){console.log("waited")}, 10000);
-    session.endDialog("This the help dialog without onselectaction <br/> Bla");
+	session.send("2");
+	bot.on("event", function (event) {
+		console.log("Event received!! This is the event"+JSON.stringify(event));
+		session.send(`Erfolgreich bei Flink eingeloggt!`).endDialog();
+	})
+	
+	// setTimeout(function(){session.send("This the help dialog without onselectaction <br/> Bla");}, 10000);
 })
 .triggerAction({
     matches: "testRoute",
 });
-
 // bot.dialog('/helpwithOnSelect', function (session, args, next) {
 //     session.endDialog("This is with onselectaction");
 // })
