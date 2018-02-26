@@ -76,13 +76,13 @@ bot.dialog("/FAQAddress",
 
 bot.dialog("/Hallo",
 	(session, args) => {
-		bot.on("event", function (event) {
-			console.log("Event received!! This is the event"+JSON.stringify(event));
-			session.send(`Yo, ich habe auf deine Nachricht reagiert`);
-		})
-		// logIntents(args);
-		// session.send(`Hallo, wie kann ich helfen?`);
-		// session.endDialog();
+		// bot.on("event", function (event) {
+		// 	console.log("Event received!! This is the event"+JSON.stringify(event));
+		// 	session.send(`Yo, ich habe auf deine Nachricht reagiert`);
+		// })
+		logIntents(args);
+		session.send(`Hallo, wie kann ich helfen?`);
+		session.endDialog();
 	},
 ).triggerAction({
 	matches: "Hallo",
