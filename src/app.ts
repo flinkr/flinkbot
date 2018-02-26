@@ -80,7 +80,8 @@ bot.dialog("/Hallo",
 		// 	console.log("Event received!! This is the event"+JSON.stringify(event));
 		// 	session.send(`Yo, ich habe auf deine Nachricht reagiert`);
 		// })
-		logIntents(args);
+		// logIntents(args);
+		console.log("hello was matched");
 		session.send(`Hallo, wie kann ich helfen?`);
 		session.endDialog();
 	},
