@@ -94,6 +94,7 @@ bot.dialog("/GetZipCode",
 	(session, args) => {
 		if (!session.userData.authToken) {
 			session.beginDialog("/Login");
+			session.send("returnes to getzipcode")
 		} else {
 			getZip();
 		}
@@ -227,6 +228,38 @@ bot.dialog("/testDateInput", [
 ]).triggerAction({
 	matches: "setBirthday",
 });
+
+
+
+// The dialog stack is cleared and this dialog is invoked when the user enters 'help'.
+bot.dialog('/test', function (session, args, next) {
+	session.send("OK the dialog beginns <br/> now");
+	session.beginDialog("/help");
+	session.send("This should be the last message").endDialog();
+})
+.triggerAction({
+    matches: "testDialog",
+});
+// The dialog stack is cleared and this dialog is invoked when the user enters 'help'.
+bot.dialog('/help', function (session, args, next) {
+	setTimeout(function(){console.log("waited")}, 10000);
+    session.endDialog("This the help dialog without onselectaction <br/> Bla");
+})
+.triggerAction({
+    matches: "testRoute",
+});
+
+// bot.dialog('/helpwithOnSelect', function (session, args, next) {
+//     session.endDialog("This is with onselectaction");
+// })
+// .triggerAction({
+//     matches: "testRoute with onSelectaction",
+//     onSelectAction: (session, args, next) => {
+//         // Add the help dialog to the dialog stack 
+//         // (override the default behavior of replacing the stack)
+//         session.beginDialog(args.action, args);
+//     }
+// });
 
 
 
