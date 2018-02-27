@@ -43,26 +43,6 @@ function getEntity(botbuilder: any, args: any, entity: string): string {
 
 
 
-
-
-bot.dialog("/Login", (session) => {
-	// construct a new message with the current session context
-	const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewLogin(session.message.user.id));
-	session.send(msg);
-	bot.on("event", function (event) {
-		console.log("Event received!! This is the event" + JSON.stringify(event));
-		session.send(`Erfolgreich bei Flink eingeloggt!`).endDialog();
-	})
-}).triggerAction({ matches: "Login" });
-
-bot.dialog("/FAQAddress",
-	(session, args) => {
-		// logIntents(args);
-		session.send(`The address is Bahnhofstrasse 5!`);
-		session.endDialog();
-	},
-).triggerAction({matches: "FAQ: Adresse von Flink" });
-
 bot.dialog("/Hallo",
 	(session, args) => {
 		// bot.on("event", function (event) {
@@ -76,23 +56,53 @@ bot.dialog("/Hallo",
 	},
 ).triggerAction({ matches: "Hallo" });
 
-bot.dialog("/GetZipCode",
+bot.dialog("/Login",
 	(session, args) => {
+		// construct a new message with the current session context
+		const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewLogin(session.message.user.id));
+		session.send(msg);
+		bot.on("event", function (event) {
+			console.log("Event received!! This is the event" + JSON.stringify(event));
+			session.send(`Erfolgreich bei Flink eingeloggt!`).endDialog();
+		})
+	}
+).triggerAction({ matches: "Login" });
+
+
+// bot.dialog("/GetZipCode", [
+// 	(session, args, next) => {
+// 		builder.Prompts.text(session, "Hi, user, what is your Username?");
+// 		// next();
+// 	},
+// 	(session, result) => {
+// 		session.userData.username = result.response;
+// 		session.userData.name2 = "testname";
+// 		session.conversationData.testdata = `this is the username in the session ${session.userData.username}`;
+// 		session.send(`Hallo, ${session.userData.username}`);
+// 		session.endDialog();
+// 	},
+// ]).triggerAction({ matches: "setUsername" });
+
+
+bot.dialog("/GetZipCode", [
+	(session, args, next) => {
 		if (!session.userData.authToken) {
 			session.beginDialog("/Login");
-			session.send("returnes to getzipcode")
 		}
 		if (session.userData.authToken) {
-			getZip();
+			next();
 		}
+	},
+	(session, args) => {
 		async function getZip() {
 			const zip = await flinkapi.getZipCode(session.userData.authToken);
 			session.send(`Dies ist deine Postleitzahl: ${zip}`);
 			session.endDialog();
 		}
+		getZip();
 
 	},
-).triggerAction({ matches: "Meine PLZ" });
+]).triggerAction({ matches: "Meine PLZ" });
 
 bot.dialog("/CostsOfInsurance",
 	(session, args) => {
@@ -200,11 +210,21 @@ bot.dialog("/testDateInput", [
 	}
 ]).triggerAction({ matches: "setBirthday" });
 
-bot.dialog('/test', function (session, args, next) {
-	session.send("OK the dialog beginns <br/> now");
-	session.beginDialog("/help");
-	session.send("This should be the last message").endDialog();
-}).triggerAction({ matches: "testDialog" });
+
+let testvar: boolean = true;
+bot.dialog('/test', [
+	(session, args, next) => {
+		session.send("please make event to continue");
+		bot.on("event", function (event) {
+			console.log("Event received!! This is the event" + JSON.stringify(event));
+			session.send(`Erfolgreich bei Flink eingeloggt!`);
+			next();
+		});
+	},
+	(session, args) => {
+		session.send("OK the dialog can now begin because we have the login token").endDialog();
+	},
+]).triggerAction({ matches: "testDialog" });
 
 bot.dialog('/help', function (session, args, next) {
 	session.send("2");
