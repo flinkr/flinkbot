@@ -6,11 +6,12 @@
     "jsRules": {},
     "rules": {
         "indent": [true, "tabs"],
-        "no-console": [false, "log", "error"],
-        "object-literal-sort-keys": [false, "warning"],
-        "object-literal-key-quotes": [false, "warning"],
-        "ordered-imports": [false, "warning"],
-        "max-line-length": [false, "warning"]
+        "no-console": [false],
+        "object-literal-sort-keys": [false],
+        "object-literal-key-quotes": [false],
+        "ordered-imports": [false],
+        "max-line-length": [false],
+        "typedef": [true, "call-signature", "parameter", "member-variable-declaration"]
     },
     "rulesDirectory": []
 }

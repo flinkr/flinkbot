@@ -41,15 +41,8 @@ function getEntity(botbuilder: any, args: any, entity: string): string {
 	return botbuilder.EntityRecognizer.findEntity(args.intent.entities.entities);
 }
 
-
-
 bot.dialog("/Hallo",
 	(session, args) => {
-		// bot.on("event", function (event) {
-		// 	console.log("Event received!! This is the event"+JSON.stringify(event));
-		// 	session.send(`Yo, ich habe auf deine Nachricht reagiert`);
-		// })
-		// logIntents(args);
 		console.log("hello was matched");
 		session.send(`Hallo, wie kann ich helfen?`);
 		session.endDialog();
@@ -61,11 +54,11 @@ bot.dialog("/Login",
 		// construct a new message with the current session context
 		const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewLogin(session.message.user.id));
 		session.send(msg);
-		bot.on("event", function (event) {
+		bot.on("event", (event) => {
 			console.log("Event received!! This is the event" + JSON.stringify(event));
 			session.send(`Erfolgreich bei Flink eingeloggt!`).endDialog();
-		})
-	}
+		});
+	},
 ).triggerAction({ matches: "Login" });
 
 bot.dialog("/GetZipCode", [
@@ -78,7 +71,7 @@ bot.dialog("/GetZipCode", [
 		}
 	},
 	(session, args) => {
-		async function getZip() {
+		async function getZip(): Promise<any> {
 			const zip = await flinkapi.getZipCode(session.userData.authToken);
 			session.send(`Dies ist deine Postleitzahl: ${zip}`);
 			session.endDialog();
@@ -122,69 +115,82 @@ bot.dialog("/", [
 	},
 ]);
 
+function createClaimObject(session: builder.Session): string {
+	for (let i = 1; i < 10; i++) {
+		if (!session.userData["claim" + i]) {
+			session.userData["claim" + i] = {};
+			return "claim" + i;
+		}
+	}
+}
+
 // Requirements on data to gather: https://docs.google.com/document/d/11pIyiS-iEqyGg6eaqsPiSQPk5rXXyDPoc4Rtx01AkYk/edit
+let currentClaimObject = "notSetYet";
 bot.dialog("/Schaden melden", [
 	(session, args, next) => {
 		// prompt for search option
 		builder.Prompts.choice(
-			session, 'Um welche Art von Schaden handelt es sich?',
+			session, "Um welche Art von Schaden handelt es sich?",
 			["Sachen von jemand anderem beschädigt", "Schaden an Mietwohnung", "Ich habe jemanden verletzt"],
 			{
 				maxRetries: 3,
-				retryPrompt: 'Not a valid option',
-				listStyle: 3
+				retryPrompt: "Not a valid option",
+				listStyle: 3,
 			});
 	},
 	(session, result) => {
+		currentClaimObject = createClaimObject(session);
+		console.log("This is claim object: " + currentClaimObject);
+		session.userData.damage1.name = "test";
 		// console.log(`this is the damage type: ${result.response}`)
 		session.userData.damage_type = result.response.entity;
 		// prompt for search option
-		builder.Prompts.text(session, 'An welchem Datum ist es passiert?');
+		builder.Prompts.text(session, "An welchem Datum ist es passiert?");
 	},
 	(session, result, next) => {
 		builder.LuisRecognizer.recognize(session.message.text, EnglishLuisModelUrl, (err, intents, entities) => {
 			console.log(`This is your entity, ${JSON.stringify(entities)}`);
-			let entity = entities;
+			const entity = entities;
 			console.log((entities as any)[0].resolution.values[0].value);
 			session.userData.damage_date = (entities as any)[0].resolution.values[0].value;
-		})
+		});
 		session.send(`Ok, am ${session.userData.damage_date} ist ein schaden vom typ ${session.userData.damage_type} passiert. Dies ist die nächste Frage?`);
-		next();// builder.Prompts.text(session, `Ok, am ${session.userData.damage_date} ist ein schaden vom typ ${session.userData.damage_type} passiert. Dies ist die nächste Frage?`);
+		next(); // builder.Prompts.text(session, `Ok, am ${session.userData.damage_date} ist ein schaden vom typ ${session.userData.damage_type} passiert. Dies ist die nächste Frage?`);
 	},
 	(session, result, next) => {
 		// construct a new message with the current session context
 		const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewClaimObjects(session.message.user.id));
 		session.send(msg);
-		bot.on("event", function (event) {
+		bot.on("event", (event) => {
 			console.log("Event received!! This is the event" + JSON.stringify(event));
+			session.send("Danke fürs eintragen, wenn du später etwas ändern willst, drücke einfach nochmals auf los gehts.!");
 			next();
 		});
 	},
 	(session, result, next) => {
-		builder.Prompts.text(session, 'Bitte gib noch eine kurze Beschreibung, was passiert ist?');
+		builder.Prompts.text(session, "Bitte gib noch eine kurze Beschreibung, was passiert ist?");
 	},
 	// Mieterschaden
 	(session, result, next) => {
 		session.userData.description = result.response;
-		if (session.userData.damage_type == "Mieterschaden") {
-			builder.Prompts.text(session, 'Bitte gib noch die Kontaktdaten des Vermieters an');
+		if (session.userData.damage_type === "Mieterschaden") {
+			builder.Prompts.text(session, "Bitte gib noch die Kontaktdaten des Vermieters an");
 		} else {
 			next();
 		}
 	},
 	(session, result) => {
 		session.userData.damage_lenderContact = result.response;
-		builder.Prompts.text(session, 'Wie ist deine IBAN-Kontonummer für die Rückzahlung?');
+		builder.Prompts.text(session, "Wie ist deine IBAN-Kontonummer für die Rückzahlung?");
 	},
 	(session, result) => {
 		session.userData.iban = result.response;
-		builder.Prompts.text(session, 'Wie ist deine Telefonnummer für allfällige Rückfragen?');
+		builder.Prompts.text(session, "Wie ist deine Telefonnummer für allfällige Rückfragen?");
 	},
 	(session, result) => {
 		session.userData.phone = result.response;
 		session.send("fertig, wurde eingereicht").endDialog();
 	},
-
 
 	// (session, result) => {
 	// 	var msg = new builder.Message(session)
@@ -199,7 +205,6 @@ bot.dialog("/Schaden melden", [
 	// 			]
 	// 			));
 	// 	session.send(msg);
-
 
 	// },
 	// (session, result) => {
@@ -216,19 +221,18 @@ bot.dialog("/testDateInput", [
 	(session, result) => {
 		builder.LuisRecognizer.recognize(session.message.text, EnglishLuisModelUrl, (err, intents, entities) => {
 			console.log(`This is your entity, ${JSON.stringify(entities)}`);
-			let entity = entities;
-			console.log((entities as any)[0].resolution.values[0].value)
-		})
+			const entity = entities;
+			console.log((entities as any)[0].resolution.values[0].value);
+		});
 		session.endDialog();
-	}
+	},
 ]).triggerAction({ matches: "setBirthday" });
 
-
-let testvar: boolean = true;
-bot.dialog('/test', [
+const testvar: boolean = true;
+bot.dialog("/test", [
 	(session, args, next) => {
 		session.send("please make event to continue");
-		bot.on("event", function (event) {
+		bot.on("event", (event) => {
 			console.log("Event received!! This is the event" + JSON.stringify(event));
 			session.send(`Erfolgreich bei Flink eingeloggt!`);
 			next();
@@ -239,15 +243,13 @@ bot.dialog('/test', [
 	},
 ]).triggerAction({ matches: "testDialog" });
 
-bot.dialog('/help', function (session, args, next) {
+bot.dialog("/help", (session, args, next) => {
 	session.send("2");
-	bot.on("event", function (event) {
+	bot.on("event", (event) => {
 		console.log("Event received!! This is the event" + JSON.stringify(event));
 		session.send(`Erfolgreich bei Flink eingeloggt!`).endDialog();
-	})
+	});
 }).triggerAction({ matches: "testRoute" });
-
-
 
 // bot.beginDialogAction('login', '/login', { matches: /^login/i });
 // bot.dialog('/login', (session) => {
@@ -256,27 +258,24 @@ bot.dialog('/help', function (session, args, next) {
 // 	session.endDialog();
 // });
 
-
-
-
-bot.dialog('/getUserData', [
-(session, args, next) => {
-	session.beginDialog("/Login1");
-},
-(session, args, next) => {
-	session.send(`This is your token ${session.userData.token}, so getUserData could be handled now`).endDialog();
-},
+bot.dialog("/getUserData", [
+	(session, args, next) => {
+		session.beginDialog("/Login1");
+	},
+	(session, args, next) => {
+		session.send(`This is your token ${session.userData.token}, so getUserData could be handled now`).endDialog();
+	},
 ]).triggerAction({ matches: "getUserData" });
 
-bot.dialog('/Login1', (session, args, next) => {
+bot.dialog("/Login1", (session, args, next) => {
 	session.send("You need to login for this action");
 	// [..open facebook webview so user can login] and wait for event
-	bot.on("event", function (event) {
+	bot.on("event", (event) => {
 		session.userData.token = "exampletoken";
 		session.send("2:Successfully logged in");
 		session.endDialog();
-	})
-})
+	});
+});
 
 // bot.dialog('/login1', (session)=>{
 //     //login
@@ -286,7 +285,7 @@ bot.dialog('/Login1', (session, args, next) => {
 
 // bot.dialog('checkshoppingcart', [
 //     (session)=>{
-//         session.beginDialog('/login1');  
+//         session.beginDialog('/login1');
 //     },
 //     (session, results)=>{
 // 		//second step

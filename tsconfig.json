@@ -15,14 +15,9 @@
         //   "./node_modules/botbuilder-azure/lib/botbuilder-azure.d.ts",
           "./node_modules/@types/restify/index.d.ts",
           "./node_modules/@types/dotenv/index.d.ts",
-          "./src/types.d.ts"
-        // , "./src/console.ts"
-        // , "./src/universal.ts" 
-        // , "./src/dialog.ts"
-        // , "./src/intent.ts"
-        // , "./src/intentTriggerAction.ts"
-        // , "./src/luis.ts"
-        // , "./src/storage.ts"
+          "./src/types.d.ts",
+          "./src/temp.ts"
+ 
     ],
     "exclude": [
         "./node_modules",
