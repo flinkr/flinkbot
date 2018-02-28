@@ -178,13 +178,13 @@ bot.dialog("/Schaden melden", [
 	},
 	// Mieterschaden
 	(session, result, next) => {
-		if(session.userData.damage_type == "Mieterschaden"){
+		if (session.userData.damage_type == "Mieterschaden") {
 			builder.Prompts.text(session, 'Bitte gib noch die Kontaktdaten des Vermieters an');
-		}else{
+		} else {
 			next();
 		}
 	},
-	
+
 	(session, result) => {
 		session.userData.damage_lenderContact = result.response.entity;
 		builder.Prompts.text(session, 'Wie ist deine IBAN-Kontonummer für die Rückzahlung?');
@@ -197,7 +197,7 @@ bot.dialog("/Schaden melden", [
 		session.userData.damage_type = result.response.entity;
 		builder.Prompts.text(session, 'Wie ist deine Telefonnummer für allfällige Rückfragen?');
 	},
-	
+
 
 	// (session, result) => {
 	// 	var msg = new builder.Message(session)
@@ -259,3 +259,50 @@ bot.dialog('/help', function (session, args, next) {
 		session.send(`Erfolgreich bei Flink eingeloggt!`).endDialog();
 	})
 }).triggerAction({ matches: "testRoute" });
+
+
+
+bot.beginDialogAction('login', '/login', { matches: /^login/i });
+bot.dialog('/login', (session) => {
+	//login
+	console.log("handling login...");
+	session.endDialog();
+});
+
+
+
+
+bot.dialog('/getUserData', [
+(session, args, next) => {
+	session.beginDialog("/Login");
+},
+(session, args, next) => {
+	session.send(`This is your token ${session.userData.token}, so getUserData could be handled now`).endDialog();
+},
+]).triggerAction({ matches: "getUserData" });
+
+bot.dialog('/Login', (session, args, next) => {
+	session.send("You need to login for this action");
+	// [..open facebook webview so user can login] and wait for event
+	bot.on("event", function (event) {
+		session.userData.token = "exampletoken";
+		session.send("2:Successfully logged in");
+		session.endDialog();
+	})
+})
+
+// bot.dialog('/login1', (session)=>{
+//     //login
+//     console.log("handling login...");
+//     session.endDialog();
+// });
+
+// bot.dialog('checkshoppingcart', [
+//     (session)=>{
+//         session.beginDialog('/login1');  
+//     },
+//     (session, results)=>{
+// 		//second step
+// 		session.send("this is the second")
+//     }
+// ]).triggerAction({matches:/^show shopping cart/i});
