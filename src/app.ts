@@ -125,7 +125,7 @@ function createClaimObject(session: builder.Session): string {
 }
 
 // Requirements on data to gather: https://docs.google.com/document/d/11pIyiS-iEqyGg6eaqsPiSQPk5rXXyDPoc4Rtx01AkYk/edit
-let currentClaimObject = "notSetYet";
+let currentClaim = "notSetYet";
 bot.dialog("/Schaden melden", [
 	(session, args, next) => {
 		// prompt for search option
@@ -139,12 +139,9 @@ bot.dialog("/Schaden melden", [
 			});
 	},
 	(session, result) => {
-		currentClaimObject = createClaimObject(session);
-		console.log("This is claim object: " + currentClaimObject);
-		session.userData.damage1.name = "test";
-		// console.log(`this is the damage type: ${result.response}`)
-		session.userData.damage_type = result.response.entity;
-		// prompt for search option
+		currentClaim = createClaimObject(session);
+		console.log("This is claim object: " + currentClaim);
+		session.userData[currentClaim].type = result.response.entity;
 		builder.Prompts.text(session, "An welchem Datum ist es passiert?");
 	},
 	(session, result, next) => {
@@ -152,9 +149,9 @@ bot.dialog("/Schaden melden", [
 			console.log(`This is your entity, ${JSON.stringify(entities)}`);
 			const entity = entities;
 			console.log((entities as any)[0].resolution.values[0].value);
-			session.userData.damage_date = (entities as any)[0].resolution.values[0].value;
+			session.userData[currentClaim].date = (entities as any)[0].resolution.values[0].value;
 		});
-		session.send(`Ok, am ${session.userData.damage_date} ist ein schaden vom typ ${session.userData.damage_type} passiert. Dies ist die nächste Frage?`);
+		session.send(`Ok, am ${session.userData[currentClaim].date} ist ein schaden vom typ ${session.userData[currentClaim].type} passiert. Dies ist die nächste Frage?`);
 		next(); // builder.Prompts.text(session, `Ok, am ${session.userData.damage_date} ist ein schaden vom typ ${session.userData.damage_type} passiert. Dies ist die nächste Frage?`);
 	},
 	(session, result, next) => {
@@ -172,15 +169,15 @@ bot.dialog("/Schaden melden", [
 	},
 	// Mieterschaden
 	(session, result, next) => {
-		session.userData.description = result.response;
-		if (session.userData.damage_type === "Mieterschaden") {
+		session.userData[currentClaim].description = result.response;
+		if (session.userData[currentClaim].type === "Mieterschaden") {
 			builder.Prompts.text(session, "Bitte gib noch die Kontaktdaten des Vermieters an");
 		} else {
 			next();
 		}
 	},
 	(session, result) => {
-		session.userData.damage_lenderContact = result.response;
+		session.userData[currentClaim].lenderContact = result.response;
 		builder.Prompts.text(session, "Wie ist deine IBAN-Kontonummer für die Rückzahlung?");
 	},
 	(session, result) => {
