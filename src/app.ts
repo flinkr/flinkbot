@@ -157,28 +157,31 @@ bot.dialog("/Schaden melden", [
 		session.send(msg);
 		bot.on("event", function (event) {
 			console.log("Event received!! This is the event" + JSON.stringify(event));
-			builder.Prompts.text(session, 'Bitte gib noch eine kurze Beschreibung, was passiert ist?');
+			next();
 		});
+	},
+	(session, result, next) => {
+		builder.Prompts.text(session, 'Bitte gib noch eine kurze Beschreibung, was passiert ist?');
 	},
 	// Mieterschaden
 	(session, result, next) => {
+		session.userData.description = result.response;
 		if (session.userData.damage_type == "Mieterschaden") {
 			builder.Prompts.text(session, 'Bitte gib noch die Kontaktdaten des Vermieters an');
 		} else {
 			next();
 		}
 	},
-
 	(session, result) => {
-		session.userData.damage_lenderContact = result.response.entity;
+		session.userData.damage_lenderContact = result.response;
 		builder.Prompts.text(session, 'Wie ist deine IBAN-Kontonummer für die Rückzahlung?');
 	},
 	(session, result) => {
-		session.userData.iban = result.response.entity;
+		session.userData.iban = result.response;
 		builder.Prompts.text(session, 'Wie ist deine IBAN für die Rückzahlung?');
 	},
 	(session, result) => {
-		session.userData.damage_type = result.response.entity;
+		session.userData.damage_type = result.response;
 		builder.Prompts.text(session, 'Wie ist deine Telefonnummer für allfällige Rückfragen?');
 	},
 
