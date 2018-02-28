@@ -138,6 +138,7 @@ bot.dialog("/", [
 	},
 ]);
 
+// Requirements on data to gather: https://docs.google.com/document/d/11pIyiS-iEqyGg6eaqsPiSQPk5rXXyDPoc4Rtx01AkYk/edit
 bot.dialog("/Schaden melden", [
 	(session, args, next) => {
 		// prompt for search option
@@ -166,12 +167,36 @@ bot.dialog("/Schaden melden", [
 		session.send(`Ok, am ${session.userData.damage_date} ist ein schaden vom typ ${session.userData.damage_type} passiert. Dies ist die nächste Frage?`);
 		next();// builder.Prompts.text(session, `Ok, am ${session.userData.damage_date} ist ein schaden vom typ ${session.userData.damage_type} passiert. Dies ist die nächste Frage?`);
 	},
-	(session, result) => {
+	(session, result, next) => {
 		// construct a new message with the current session context
 		const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewLogin(session.message.user.id));
 		session.send(msg);
-
+		bot.on("event", function (event) {
+			console.log("Event received!! This is the event" + JSON.stringify(event));
+			builder.Prompts.text(session, 'Bitte gib noch eine kurze Beschreibung, was passiert ist?');
+		});
 	},
+	// Falls Mieterschaden: Kontaktdaten vom Mieter
+	(session, result, next) => {
+		if(session.userData.damage_type == "Mieterschaden"){
+			builder.Prompts.text(session, 'Bitte gib noch die Kontaktdaten des Vermieters an');
+		}else{
+			next();
+		}
+	},
+	(session, result) => {
+		session.userData.damage_lenderContact = result.response.entity;
+		builder.Prompts.text(session, 'Wie ist deine IBAN-Kontonummer für die Rückzahlung?');
+	},
+	(session, result) => {
+		session.userData.iban = result.response.entity;
+		builder.Prompts.text(session, 'Wie ist deine IBAN für die Rückzahlung?');
+	},
+	(session, result) => {
+		session.userData.damage_type = result.response.entity;
+		builder.Prompts.text(session, 'Wie ist deine Telefonnummer für allfällige Rückfragen?');
+	},
+	
 
 	// (session, result) => {
 	// 	var msg = new builder.Message(session)
@@ -233,36 +258,3 @@ bot.dialog('/help', function (session, args, next) {
 		session.send(`Erfolgreich bei Flink eingeloggt!`).endDialog();
 	})
 }).triggerAction({ matches: "testRoute" });
-
-
-
-
-
-
-
-// bot.dialog('/helpwithOnSelect', function (session, args, next) {
-//     session.endDialog("This is with onselectaction");
-// })
-// .triggerAction({
-//     matches: "testRoute with onSelectaction",
-//     onSelectAction: (session, args, next) => {
-//         // Add the help dialog to the dialog stack 
-//         // (override the default behavior of replacing the stack)
-//         session.beginDialog(args.action, args);
-//     }
-// });
-
-
-
-
-
-
-// bot.on("event", function (event) {
-// 	console.log("Event received!! This is the event"+JSON.stringify(event));
-//     var msg = new builder.Message().address(event.address);
-//     msg.data.textLocale = "en-us";
-//     if (event.name === "buttonClicked") {
-//         msg.data.text = "I see that you clicked a button.";
-//     }
-//     bot.send(msg);
-// })
