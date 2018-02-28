@@ -16,7 +16,7 @@ export function fbWebviewLogin(userId: string): object {
 							buttons: [
 								{
 									type: "web_url",
-									url: `https://flinkbot-webview-win.azurewebsites.net/login?${userId}`,
+									url: `https://flinkbot-webview-win.azurewebsites.net/login?userId=${userId}`,
 									title: "Login",
 									webview_height_ratio: "compact",
 									messenger_extensions: true,
@@ -45,7 +45,7 @@ export function fbWebviewClaimObjects(userId: string): object {
 							buttons: [
 								{
 									type: "web_url",
-									url: `https://flinkbot-webview-win.azurewebsites.net/claimObjects?${userId}`,
+									url: `https://flinkbot-webview-win.azurewebsites.net/claimObjects?userId=${userId}`,
 									title: "Los geht's",
 									webview_height_ratio: "compact",
 									messenger_extensions: true,
