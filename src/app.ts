@@ -274,14 +274,14 @@ bot.dialog('/login', (session) => {
 
 bot.dialog('/getUserData', [
 (session, args, next) => {
-	session.beginDialog("/Login");
+	session.beginDialog("/Login1");
 },
 (session, args, next) => {
 	session.send(`This is your token ${session.userData.token}, so getUserData could be handled now`).endDialog();
 },
 ]).triggerAction({ matches: "getUserData" });
 
-bot.dialog('/Login', (session, args, next) => {
+bot.dialog('/Login1', (session, args, next) => {
 	session.send("You need to login for this action");
 	// [..open facebook webview so user can login] and wait for event
 	bot.on("event", function (event) {
