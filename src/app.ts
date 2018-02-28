@@ -178,11 +178,11 @@ bot.dialog("/Schaden melden", [
 	},
 	(session, result) => {
 		session.userData.iban = result.response;
-		builder.Prompts.text(session, 'Wie ist deine IBAN für die Rückzahlung?');
+		builder.Prompts.text(session, 'Wie ist deine Telefonnummer für allfällige Rückfragen?');
 	},
 	(session, result) => {
-		session.userData.damage_type = result.response;
-		builder.Prompts.text(session, 'Wie ist deine Telefonnummer für allfällige Rückfragen?');
+		session.userData.phone = result.response;
+		session.send("fertig, wurde eingereicht").endDialog();
 	},
 
 
@@ -202,10 +202,10 @@ bot.dialog("/Schaden melden", [
 
 
 	// },
-	(session, result) => {
-		session.send(`Ok, deine wahl war, ${result}`);
-		session.endDialog();
-	},
+	// (session, result) => {
+	// 	session.send(`Ok, deine wahl war, ${result}`);
+	// 	session.endDialog();
+	// },
 ]).triggerAction({ matches: "Schaden melden" });
 
 bot.dialog("/testDateInput", [
