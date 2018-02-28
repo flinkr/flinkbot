@@ -176,7 +176,7 @@ bot.dialog("/Schaden melden", [
 			builder.Prompts.text(session, 'Bitte gib noch eine kurze Beschreibung, was passiert ist?');
 		});
 	},
-	// Falls Mieterschaden: Kontaktdaten vom Mieter
+	// Mieterschaden
 	(session, result, next) => {
 		if(session.userData.damage_type == "Mieterschaden"){
 			builder.Prompts.text(session, 'Bitte gib noch die Kontaktdaten des Vermieters an');
@@ -184,6 +184,7 @@ bot.dialog("/Schaden melden", [
 			next();
 		}
 	},
+	
 	(session, result) => {
 		session.userData.damage_lenderContact = result.response.entity;
 		builder.Prompts.text(session, 'Wie ist deine IBAN-Kontonummer für die Rückzahlung?');
