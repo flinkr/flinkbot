@@ -68,22 +68,6 @@ bot.dialog("/Login",
 	}
 ).triggerAction({ matches: "Login" });
 
-
-// bot.dialog("/GetZipCode", [
-// 	(session, args, next) => {
-// 		builder.Prompts.text(session, "Hi, user, what is your Username?");
-// 		// next();
-// 	},
-// 	(session, result) => {
-// 		session.userData.username = result.response;
-// 		session.userData.name2 = "testname";
-// 		session.conversationData.testdata = `this is the username in the session ${session.userData.username}`;
-// 		session.send(`Hallo, ${session.userData.username}`);
-// 		session.endDialog();
-// 	},
-// ]).triggerAction({ matches: "setUsername" });
-
-
 bot.dialog("/GetZipCode", [
 	(session, args, next) => {
 		if (!session.userData.authToken) {
@@ -130,7 +114,7 @@ bot.dialog("/setUsername", [
 
 bot.dialog("/", [
 	(sess, args, next) => {
-		builder.Prompts.text(sess, "Hi, how can i help you?");
+		builder.Prompts.text(sess, "Hi, this is de default / route. You should not end up here, blame timo");
 	},
 	(sess, result) => {
 		sess.userData.name = result.response;
