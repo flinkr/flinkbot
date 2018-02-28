@@ -249,12 +249,12 @@ bot.dialog('/help', function (session, args, next) {
 
 
 
-bot.beginDialogAction('login', '/login', { matches: /^login/i });
-bot.dialog('/login', (session) => {
-	//login
-	console.log("handling login...");
-	session.endDialog();
-});
+// bot.beginDialogAction('login', '/login', { matches: /^login/i });
+// bot.dialog('/login', (session) => {
+// 	//login
+// 	console.log("handling login...");
+// 	session.endDialog();
+// });
 
 
 
