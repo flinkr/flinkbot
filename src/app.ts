@@ -158,7 +158,7 @@ bot.dialog("/Schaden melden", [
 	},
 	(session, result, next) => {
 		// construct a new message with the current session context
-		const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewClaimObjects(session.message.user.id));
+		const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewClaimObjects(session.message.user.id, currentClaim));
 		session.send(msg);
 		bot.on("event", (event) => {
 			if (event.name === "claimObjectsSuccessful") {
@@ -286,4 +286,4 @@ bot.dialog("/testDateInput", [
 	// (session, result) => {
 	// 	session.send(`Ok, deine wahl war, ${result}`);
 	// 	session.endDialog();
-	// },
+	// }
