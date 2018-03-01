@@ -189,25 +189,6 @@ bot.dialog("/Schaden melden", [
 		session.send("fertig, wurde eingereicht").endDialog();
 	},
 
-	// (session, result) => {
-	// 	var msg = new builder.Message(session)
-	// 		.text("Um welche Art von Schaden handelt es sich?")
-	// 		.suggestedActions(
-	// 			builder.SuggestedActions.create(session, [
-	// 				builder.CardAction.imBack(session, "Ich habe die Sachen von jemand anderem beschädigt", "Sachen von jemand anderem beschädigt"),
-	// 				builder.CardAction.imBack(session, "Ich habe etwas in der Mietwohnung kaputtgemacht", "Schaden an Mietwohnung"),
-	// 				builder.CardAction.imBack(session, "Mir wurde etwas gestohlen", "Diebstahl"),
-	// 				builder.CardAction.imBack(session, "Ich habe jemanden verletzt", "Ich habe jemanden verletzt"),
-	// 				builder.CardAction.imBack(session, "Etwas von mir wurde beschädigt", "Etwas von mir ist Beschädigt")
-	// 			]
-	// 			));
-	// 	session.send(msg);
-
-	// },
-	// (session, result) => {
-	// 	session.send(`Ok, deine wahl war, ${result}`);
-	// 	session.endDialog();
-	// },
 ]).triggerAction({ matches: "Schaden melden" });
 
 bot.dialog("/testDateInput", [
@@ -248,31 +229,24 @@ bot.dialog("/help", (session, args, next) => {
 	});
 }).triggerAction({ matches: "testRoute" });
 
-// bot.beginDialogAction('login', '/login', { matches: /^login/i });
-// bot.dialog('/login', (session) => {
-// 	//login
-// 	console.log("handling login...");
-// 	session.endDialog();
+// bot.dialog("/getUserData", [
+// 	(session, args, next) => {
+// 		session.beginDialog("/Login1");
+// 	},
+// 	(session, args, next) => {
+// 		session.send(`This is your token ${session.userData.token}, so getUserData could be handled now`).endDialog();
+// 	},
+// ]).triggerAction({ matches: "getUserData" });
+
+// bot.dialog("/Login1", (session, args, next) => {
+// 	session.send("You need to login for this action");
+// 	// [..open facebook webview so user can login] and wait for event
+// 	bot.on("event", (event) => {
+// 		session.userData.token = "exampletoken";
+// 		session.send("2:Successfully logged in");
+// 		session.endDialog();
+// 	});
 // });
-
-bot.dialog("/getUserData", [
-	(session, args, next) => {
-		session.beginDialog("/Login1");
-	},
-	(session, args, next) => {
-		session.send(`This is your token ${session.userData.token}, so getUserData could be handled now`).endDialog();
-	},
-]).triggerAction({ matches: "getUserData" });
-
-bot.dialog("/Login1", (session, args, next) => {
-	session.send("You need to login for this action");
-	// [..open facebook webview so user can login] and wait for event
-	bot.on("event", (event) => {
-		session.userData.token = "exampletoken";
-		session.send("2:Successfully logged in");
-		session.endDialog();
-	});
-});
 
 // bot.dialog('/login1', (session)=>{
 //     //login
@@ -289,3 +263,23 @@ bot.dialog("/Login1", (session, args, next) => {
 // 		session.send("this is the second")
 //     }
 // ]).triggerAction({matches:/^show shopping cart/i});
+
+// (session, result) => {
+	// 	var msg = new builder.Message(session)
+	// 		.text("Um welche Art von Schaden handelt es sich?")
+	// 		.suggestedActions(
+	// 			builder.SuggestedActions.create(session, [
+	// 				builder.CardAction.imBack(session, "Ich habe die Sachen von jemand anderem beschädigt", "Sachen von jemand anderem beschädigt"),
+	// 				builder.CardAction.imBack(session, "Ich habe etwas in der Mietwohnung kaputtgemacht", "Schaden an Mietwohnung"),
+	// 				builder.CardAction.imBack(session, "Mir wurde etwas gestohlen", "Diebstahl"),
+	// 				builder.CardAction.imBack(session, "Ich habe jemanden verletzt", "Ich habe jemanden verletzt"),
+	// 				builder.CardAction.imBack(session, "Etwas von mir wurde beschädigt", "Etwas von mir ist Beschädigt")
+	// 			]
+	// 			));
+	// 	session.send(msg);
+
+	// },
+	// (session, result) => {
+	// 	session.send(`Ok, deine wahl war, ${result}`);
+	// 	session.endDialog();
+	// },
