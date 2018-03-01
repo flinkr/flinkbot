@@ -100,8 +100,7 @@ bot.dialog("/setUsername", [
 	},
 	(session, result) => {
 		session.userData.username = result.response;
-		session.userData.name2 = "testname";
-		session.conversationData.testdata = `this is the username in the session ${session.userData.username}`;
+		// session.conversationData.testdata = `this is the username in the session ${session.userData.username}`;
 		session.send(`Hallo, ${session.userData.username}`);
 		session.endDialog();
 	},
