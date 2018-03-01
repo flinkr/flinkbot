@@ -55,8 +55,10 @@ bot.dialog("/Login",
 		const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewLogin(session.message.user.id));
 		session.send(msg);
 		bot.on("event", (event) => {
-			console.log("Event received!! This is the event" + JSON.stringify(event));
-			session.send(`Erfolgreich bei Flink eingeloggt!`).endDialog();
+			if (event.name === "loginSucessful") {
+				console.log("Event received!! This is the event" + JSON.stringify(event));
+				session.send(`Erfolgreich bei Flink eingeloggt!`).endDialog();
+			}
 		});
 	},
 ).triggerAction({ matches: "Login" });
