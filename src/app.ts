@@ -161,9 +161,11 @@ bot.dialog("/Schaden melden", [
 		const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewClaimObjects(session.message.user.id));
 		session.send(msg);
 		bot.on("event", (event) => {
-			console.log("Event received!! This is the event" + JSON.stringify(event));
-			session.send("Danke fürs eintragen, wenn du später etwas ändern willst, drücke einfach nochmals auf los gehts.!");
-			next();
+			if (event.name === "claimObjectsSuccessful") {
+				console.log("Event received!! This is the event" + JSON.stringify(event));
+				session.send("Danke fürs eintragen, wenn du später etwas ändern willst, drücke einfach nochmals auf los gehts.!");
+				next();
+			}
 		});
 	},
 	(session, result, next) => {
@@ -208,28 +210,28 @@ bot.dialog("/testDateInput", [
 	},
 ]).triggerAction({ matches: "setBirthday" });
 
-const testvar: boolean = true;
-bot.dialog("/test", [
-	(session, args, next) => {
-		session.send("please make event to continue");
-		bot.on("event", (event) => {
-			console.log("Event received!! This is the event" + JSON.stringify(event));
-			session.send(`Erfolgreich bei Flink eingeloggt!`);
-			next();
-		});
-	},
-	(session, args) => {
-		session.send("OK the dialog can now begin because we have the login token").endDialog();
-	},
-]).triggerAction({ matches: "testDialog" });
+// const testvar: boolean = true;
+// bot.dialog("/test", [
+// 	(session, args, next) => {
+// 		session.send("please make event to continue");
+// 		bot.on("event", (event) => {
+// 			console.log("Event received!! This is the event" + JSON.stringify(event));
+// 			session.send(`Erfolgreich bei Flink eingeloggt!`);
+// 			next();
+// 		});
+// 	},
+// 	(session, args) => {
+// 		session.send("OK the dialog can now begin because we have the login token").endDialog();
+// 	},
+// ]).triggerAction({ matches: "testDialog" });
 
-bot.dialog("/help", (session, args, next) => {
-	session.send("2");
-	bot.on("event", (event) => {
-		console.log("Event received!! This is the event" + JSON.stringify(event));
-		session.send(`Erfolgreich bei Flink eingeloggt!`).endDialog();
-	});
-}).triggerAction({ matches: "testRoute" });
+// bot.dialog("/help", (session, args, next) => {
+// 	session.send("2");
+// 	bot.on("event", (event) => {
+// 		console.log("Event received!! This is the event" + JSON.stringify(event));
+// 		session.send(`Erfolgreich bei Flink eingeloggt!`).endDialog();
+// 	});
+// }).triggerAction({ matches: "testRoute" });
 
 // bot.dialog("/getUserData", [
 // 	(session, args, next) => {
