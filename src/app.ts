@@ -152,8 +152,7 @@ bot.dialog("/Schaden melden", [
 			console.log((entities as any)[0].resolution.values[0].value);
 			session.userData[currentClaim].date = (entities as any)[0].resolution.values[0].value;
 		});
-		session.send(`Ok, am ${session.userData[currentClaim].date} ist ein schaden vom typ ${session.userData[currentClaim].type} passiert. Dies ist die nächste Frage?`);
-		next(); // builder.Prompts.text(session, `Ok, am ${session.userData.damage_date} ist ein schaden vom typ ${session.userData.damage_type} passiert. Dies ist die nächste Frage?`);
+		session.send(`Ok, am ${session.userData[currentClaim].date} ist ein schaden vom typ ${session.userData[currentClaim].type} passiert. `);
 	},
 	(session, result, next) => {
 		// construct a new message with the current session context
@@ -194,16 +193,54 @@ bot.dialog("/Schaden melden", [
 
 ]).triggerAction({ matches: "Schaden melden" });
 
+function sanitizeDatesForLuis(input: string): any[] {
+	input.toLowerCase();
+	input.replace(".", "-");
+	input.replace(/jan|januar/gi, "january");
+	input.replace(/feb|februar/gi, "february");
+	input.replace(/märz/gi, "march");
+	input.replace(/april/gi, "april");
+	input.replace(/mai/gi, "may");
+	input.replace(/juni/gi, "june");
+	input.replace(/juli/gi, "july");
+	input.replace(/aug|august/gi, "august");
+	input.replace(/sept|september/gi, "september");
+	input.replace(/okt|oktober/gi, "october");
+	input.replace(/nov|november/gi, "november");
+	input.replace(/dez|dezember/gi, "december");
+	input.replace("heute", "today");
+	input.replace(/gester|gestern/gi, "yesterday");
+
+	if (input.includes("january" || "february" || "march" || "april" || "may" || "june" || "july" || "august" || "september" || "october" || "november" || "december" )){
+		return [input, false];
+	} else {
+		return [input, true];
+	}
+}
+
+function postProcessDate(input: string): string {
+	const day = input.substring(5, 7);
+	const month = input.substring(8, 10);
+	const year = input.substring(0, 4);
+	return `${year}-${month}-${day}`;
+}
+
 bot.dialog("/testDateInput", [
 	(session, args, next) => {
-		builder.Prompts.text(session, "Hi, user, what is your Birthday?");
+		builder.Prompts.text(session, "Hi, user, what is your Birthday? 12-1-1991 => 1991-12-01, 12. jan 1991 => 1991-01-12, 25-1-1991 => 1991-01-25");
 		// next();
 	},
 	(session, result) => {
-		builder.LuisRecognizer.recognize(session.message.text, EnglishLuisModelUrl, (err, intents, entities) => {
-			console.log(`This is your entity, ${JSON.stringify(entities)}`);
+		let sanitizedDateArray = sanitizeDatesForLuis(result.response);
+		builder.LuisRecognizer.recognize(sanitizedDateArray[0], EnglishLuisModelUrl, (err, intents, entities) => {
+			// console.log(`This is your entity, ${JSON.stringify(entities)}`);
 			const entity = entities;
 			console.log((entities as any)[0].resolution.values[0].value);
+			let date = (entities as any)[0].resolution.values[0].value;
+			if (sanitizedDateArray[1]) {
+				date = postProcessDate(date);
+			}
+			session.userData.date = date;
 		});
 		session.endDialog();
 	},
