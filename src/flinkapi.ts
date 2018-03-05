@@ -1,9 +1,9 @@
 import * as rp from "request-promise";
 import * as restify from "restify";
 
-export async function getZipCode(token: string) {
+export async function getZipCode(token: string): Promise<any> {
 	try {
-		let userInfo = await getUserInfo(token);
+		const userInfo = await getUserInfo(token);
 		// tslint:disable-next-line:prefer-const
 		let zipCode = userInfo.zipCode;
 		console.log("this is your zip code" + zipCode);
@@ -13,7 +13,7 @@ export async function getZipCode(token: string) {
 	}
 }
 
-export function getUserInfo(token: string) {
+export function getUserInfo(token: string): Promise<any> {
 	const options = {
 		method: "GET",
 		uri: "https://test.goflink.ch/api/v1/customers/me",

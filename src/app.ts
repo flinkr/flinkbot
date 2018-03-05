@@ -4,6 +4,7 @@ import * as dotenv from "dotenv";
 import * as restify from "restify";
 import * as util from "util";
 import * as flinkapi from "./flinkapi";
+import * as dateExtractor from "./dateExtractor";
 import * as fb_attachments from "./fb_attachments";
 // tslint:disable-next-line:no-var-requires
 const azure = require("botbuilder-azure");
@@ -32,7 +33,7 @@ const conn = new builder.ChatConnector({
 	appPassword: process.env.MICROSOFT_APP_PASSWORD,
 });
 const LuisModelUrl = process.env.LUIS_MODEL_URL;
-const EnglishLuisModelUrl = process.env.LUIS_MODEL_URL_ENGLISH_ENTITIES;
+
 const bot = new builder.UniversalBot(conn).set("storage", cosmosStorage);
 bot.recognizer(new builder.LuisRecognizer(LuisModelUrl));
 server.post("/api/messages", conn.listen());
@@ -145,15 +146,15 @@ bot.dialog("/Schaden melden", [
 		session.userData[currentClaim].type = result.response.entity;
 		builder.Prompts.text(session, "An welchem Datum ist es passiert?");
 	},
-	(session, result, next) => {
-		builder.LuisRecognizer.recognize(session.message.text, EnglishLuisModelUrl, (err, intents, entities) => {
-			console.log(`This is your entity, ${JSON.stringify(entities)}`);
-			const entity = entities;
-			console.log((entities as any)[0].resolution.values[0].value);
-			session.userData[currentClaim].date = (entities as any)[0].resolution.values[0].value;
-		});
-		session.send(`Ok, am ${session.userData[currentClaim].date} ist ein schaden vom typ ${session.userData[currentClaim].type} passiert. `);
-	},
+	// (session, result, next) => {
+	// 	builder.LuisRecognizer.recognize(session.message.text, EnglishLuisModelUrl, (err, intents, entities) => {
+	// 		console.log(`This is your entity, ${JSON.stringify(entities)}`);
+	// 		const entity = entities;
+	// 		console.log((entities as any)[0].resolution.values[0].value);
+	// 		session.userData[currentClaim].date = (entities as any)[0].resolution.values[0].value;
+	// 	});
+	// 	session.send(`Ok, am ${session.userData[currentClaim].date} ist ein schaden vom typ ${session.userData[currentClaim].type} passiert. `);
+	// },
 	(session, result, next) => {
 		// construct a new message with the current session context
 		const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewClaimObjects(session.message.user.id, currentClaim));
@@ -193,56 +194,17 @@ bot.dialog("/Schaden melden", [
 
 ]).triggerAction({ matches: "Schaden melden" });
 
-function sanitizeDatesForLuis(input: string): any[] {
-	input.toLowerCase();
-	input.replace(".", "-");
-	input.replace(/jan|januar/gi, "january");
-	input.replace(/feb|februar/gi, "february");
-	input.replace(/märz/gi, "march");
-	input.replace(/april/gi, "april");
-	input.replace(/mai/gi, "may");
-	input.replace(/juni/gi, "june");
-	input.replace(/juli/gi, "july");
-	input.replace(/aug|august/gi, "august");
-	input.replace(/sept|september/gi, "september");
-	input.replace(/okt|oktober/gi, "october");
-	input.replace(/nov|november/gi, "november");
-	input.replace(/dez|dezember/gi, "december");
-	input.replace("heute", "today");
-	input.replace(/gester|gestern/gi, "yesterday");
-
-	if (input.includes("january" || "february" || "march" || "april" || "may" || "june" || "july" || "august" || "september" || "october" || "november" || "december" )){
-		return [input, false];
-	} else {
-		return [input, true];
-	}
-}
-
-function postProcessDate(input: string): string {
-	const day = input.substring(5, 7);
-	const month = input.substring(8, 10);
-	const year = input.substring(0, 4);
-	return `${year}-${month}-${day}`;
-}
-
 bot.dialog("/testDateInput", [
 	(session, args, next) => {
-		builder.Prompts.text(session, "Hi, user, what is your Birthday? 12-1-1991 => 1991-12-01, 12. jan 1991 => 1991-01-12, 25-1-1991 => 1991-01-25");
-		// next();
+		builder.Prompts.text(session, "Hi, user, what is your Birthday?");
 	},
 	(session, result) => {
-		let sanitizedDateArray = sanitizeDatesForLuis(result.response);
-		builder.LuisRecognizer.recognize(sanitizedDateArray[0], EnglishLuisModelUrl, (err, intents, entities) => {
-			// console.log(`This is your entity, ${JSON.stringify(entities)}`);
-			const entity = entities;
-			console.log((entities as any)[0].resolution.values[0].value);
-			let date = (entities as any)[0].resolution.values[0].value;
-			if (sanitizedDateArray[1]) {
-				date = postProcessDate(date);
-			}
-			session.userData.date = date;
-		});
-		session.endDialog();
+		async function extractDate(): Promise<any> {
+			const date = await dateExtractor.extractDate(result.response);
+			session.send(`This is your date: ${JSON.stringify(date)}`);
+			session.endDialog();
+		}
+		extractDate();
 	},
 ]).triggerAction({ matches: "setBirthday" });
 
