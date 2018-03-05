@@ -5,13 +5,13 @@ const EnglishLuisModelUrl = process.env.LUIS_MODEL_URL_ENGLISH_ENTITIES;
 
 export async function extractDate(userInput: string): Promise<any> {
 	try {
-		console.log("...........userinput: " + userInput);
+		// console.log("...........userinput: " + userInput);
 		let date: string;
 		const sanitizedDateArray = sanitizeDatesForLuis(userInput);
 		const returnedFromLuis = await getDateFromLuisAsync(sanitizedDateArray);
-		console.log(".......Returned from luis: " + JSON.stringify(returnedFromLuis));
+		// console.log(".......Returned from luis: " + JSON.stringify(returnedFromLuis));
 		date = (returnedFromLuis as any)[0].resolution.values[0].value;
-		console.log(".......This is the return value: " + JSON.stringify(date));
+		// console.log(".......This is the return value: " + JSON.stringify(date));
 		// if the month number is >12 luis gets that this has to be the month so dont change order in those cases.
 		if (Number((returnedFromLuis as any)[0].entity.substring(0, 2)) > 12) {
 			sanitizedDateArray[1] = false;
@@ -19,7 +19,7 @@ export async function extractDate(userInput: string): Promise<any> {
 		if (sanitizedDateArray[1]) {
 			date = postProcessDate(date);
 		}
-		console.log(".........first: this is date to return1" + date);
+		// console.log(".........first: this is date to return1" + date);
 		return date;
 	} catch (err) {
 		console.log("ERROR HAPPENED: " + err);
