@@ -25,7 +25,6 @@ export async function extractDate(userInput: string): Promise<any> {
 		console.log("ERROR HAPPENED: " + err);
 		return err;
 	}
-
 }
 
 function getDateFromLuisAsync(sanitizedDateArray: any[]): Promise<any> {

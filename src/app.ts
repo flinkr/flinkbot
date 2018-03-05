@@ -146,15 +146,14 @@ bot.dialog("/Schaden melden", [
 		session.userData[currentClaim].type = result.response.entity;
 		builder.Prompts.text(session, "An welchem Datum ist es passiert?");
 	},
-	// (session, result, next) => {
-	// 	builder.LuisRecognizer.recognize(session.message.text, EnglishLuisModelUrl, (err, intents, entities) => {
-	// 		console.log(`This is your entity, ${JSON.stringify(entities)}`);
-	// 		const entity = entities;
-	// 		console.log((entities as any)[0].resolution.values[0].value);
-	// 		session.userData[currentClaim].date = (entities as any)[0].resolution.values[0].value;
-	// 	});
-	// 	session.send(`Ok, am ${session.userData[currentClaim].date} ist ein schaden vom typ ${session.userData[currentClaim].type} passiert. `);
-	// },
+	(session, result, next) => {
+		async function extractDate(): Promise<any> {
+			session.userData[currentClaim].date = await dateExtractor.extractDate(result.response);
+			console.log("This was saved as claim date in db" + session.userData[currentClaim].date);
+		}
+		extractDate();
+		next();
+	},
 	(session, result, next) => {
 		// construct a new message with the current session context
 		const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewClaimObjects(session.message.user.id, currentClaim));
