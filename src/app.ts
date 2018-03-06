@@ -6,6 +6,7 @@ import * as util from "util";
 import * as flinkapi from "./flinkapi";
 import * as dateExtractor from "./dateExtractor";
 import * as fb_attachments from "./fb_attachments";
+import * as middleware from "./middleware";
 // tslint:disable-next-line:no-var-requires
 const azure = require("botbuilder-azure");
 dotenv.config();
@@ -37,6 +38,16 @@ const LuisModelUrl = process.env.LUIS_MODEL_URL;
 const bot = new builder.UniversalBot(conn).set("storage", cosmosStorage);
 bot.recognizer(new builder.LuisRecognizer(LuisModelUrl));
 server.post("/api/messages", conn.listen());
+
+bot.use({
+	botbuilder: (session, next) => {
+		// middleware.logIncomingMessage(session, next);
+		middleware.routeMessage(session, next);
+	},
+	send: (event, next) => {
+		middleware.logOutgoingMessage(event, next);
+	},
+});
 
 function getEntity(botbuilder: any, args: any, entity: string): string {
 	return botbuilder.EntityRecognizer.findEntity(args.intent.entities.entities);
@@ -207,80 +218,11 @@ bot.dialog("/testDateInput", [
 	},
 ]).triggerAction({ matches: "setBirthday" });
 
-// const testvar: boolean = true;
-// bot.dialog("/test", [
-// 	(session, args, next) => {
-// 		session.send("please make event to continue");
-// 		bot.on("event", (event) => {
-// 			console.log("Event received!! This is the event" + JSON.stringify(event));
-// 			session.send(`Erfolgreich bei Flink eingeloggt!`);
-// 			next();
-// 		});
-// 	},
-// 	(session, args) => {
-// 		session.send("OK the dialog can now begin because we have the login token").endDialog();
-// 	},
-// ]).triggerAction({ matches: "testDialog" });
-
-// bot.dialog("/help", (session, args, next) => {
-// 	session.send("2");
-// 	bot.on("event", (event) => {
-// 		console.log("Event received!! This is the event" + JSON.stringify(event));
-// 		session.send(`Erfolgreich bei Flink eingeloggt!`).endDialog();
-// 	});
-// }).triggerAction({ matches: "testRoute" });
-
-// bot.dialog("/getUserData", [
-// 	(session, args, next) => {
-// 		session.beginDialog("/Login1");
-// 	},
-// 	(session, args, next) => {
-// 		session.send(`This is your token ${session.userData.token}, so getUserData could be handled now`).endDialog();
-// 	},
-// ]).triggerAction({ matches: "getUserData" });
-
-// bot.dialog("/Login1", (session, args, next) => {
-// 	session.send("You need to login for this action");
-// 	// [..open facebook webview so user can login] and wait for event
-// 	bot.on("event", (event) => {
-// 		session.userData.token = "exampletoken";
-// 		session.send("2:Successfully logged in");
-// 		session.endDialog();
-// 	});
-// });
-
-// bot.dialog('/login1', (session)=>{
-//     //login
-//     console.log("handling login...");
-//     session.endDialog();
-// });
-
-// bot.dialog('checkshoppingcart', [
-//     (session)=>{
-//         session.beginDialog('/login1');
-//     },
-//     (session, results)=>{
-// 		//second step
-// 		session.send("this is the second")
-//     }
-// ]).triggerAction({matches:/^show shopping cart/i});
-
-// (session, result) => {
-	// 	var msg = new builder.Message(session)
-	// 		.text("Um welche Art von Schaden handelt es sich?")
-	// 		.suggestedActions(
-	// 			builder.SuggestedActions.create(session, [
-	// 				builder.CardAction.imBack(session, "Ich habe die Sachen von jemand anderem beschädigt", "Sachen von jemand anderem beschädigt"),
-	// 				builder.CardAction.imBack(session, "Ich habe etwas in der Mietwohnung kaputtgemacht", "Schaden an Mietwohnung"),
-	// 				builder.CardAction.imBack(session, "Mir wurde etwas gestohlen", "Diebstahl"),
-	// 				builder.CardAction.imBack(session, "Ich habe jemanden verletzt", "Ich habe jemanden verletzt"),
-	// 				builder.CardAction.imBack(session, "Etwas von mir wurde beschädigt", "Etwas von mir ist Beschädigt")
-	// 			]
-	// 			));
-	// 	session.send(msg);
-
-	// },
-	// (session, result) => {
-	// 	session.send(`Ok, deine wahl war, ${result}`);
-	// 	session.endDialog();
-	// }
+bot.dialog("/handOverToHuman", [
+	(session, args, next) => {
+		session.send("Wir leiten dich gleich an einen Flink-Mitarbeiter weiter!");
+		flinkapi.getHumanOnSlack("The bot needs your help on facebook!");
+		session.conversationData.state = "handedToHuman";
+		session.endDialog();
+	},
+]).triggerAction({ matches: "handover" });

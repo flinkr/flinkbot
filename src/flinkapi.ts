@@ -22,3 +22,15 @@ export function getUserInfo(token: string): Promise<any> {
 	};
 	return rp(options);
 }
+
+export function getHumanOnSlack(message: string): Promise<any> {
+	const options = {
+		method: "POST",
+		uri: "https://hooks.slack.com/services/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",
+		body: {
+			"text": message,
+		},
+		json: true, // Automatically stringifies the body to JSON
+	};
+	return rp(options);
+}
