@@ -55,27 +55,22 @@ function getEntity(botbuilder: any, args: any, entity: string): string {
 	return botbuilder.EntityRecognizer.findEntity(args.intent.entities.entities);
 }
 
-function createHeroCard(session: builder.Session): any {
-	return new builder.HeroCard(session)
-		.title("BotFramework Hero Card")
-		.subtitle("Your bots — wherever your users are talking")
-		.text("Build and connect intelligent bots to interact with your users naturally wherever they are, from text/sms to Skype, Slack, Office 365 mail and other popular services.")
-		.images([
-			builder.CardImage.create(session, "https://sec.ch9.ms/ch9/7ff5/e07cfef0-aa3b-40bb-9baa-7c9ef8ff7ff5/buildreactionbotframework_960.jpg"),
-		])
-		.buttons([
-			builder.CardAction.openUrl(session, "https://www.goflink.ch", "Get Started"),
-			builder.CardAction.imBack(session, `click`, "Click"),
-			builder.CardAction.imBack(session, `clack`, "Clack"),
-		]);
-}
+
 
 bot.dialog("/Hallo", [
 	(session, args) => {
 		console.log("hello was matched");
 		// session.send(`Hallo, wie kann ich helfen?`);
-		const msg = new builder.Message(session).addAttachment(heroCards.createHeroCard_damageType(session));
-		builder.Prompts.text(session, msg);
+		// const msg = new builder.Message(session).addAttachment(heroCards.createHeroCard_damageType(session));
+		// builder.Prompts.text(session, msg);
+		builder.Prompts.choice(
+			session, "Um welche Art von Schaden handelt es sich?",
+			["Sachen von jemand", "Schaden", "Ich habe jemanden verletzt"],
+			{
+				maxRetries: 3,
+				retryPrompt: "Not a valid option",
+				listStyle: 3,
+			});
 	},
 	(session, result, args) => {
 		session.send(`step 2 ${result.response}`);
@@ -163,7 +158,7 @@ let currentClaim = "notSetYet";
 bot.dialog("/Schaden melden", [
 	(session, args, next) => {
 		const msg = new builder.Message(session).addAttachment(heroCards.createHeroCard_damageType(session));
-		session.send(msg);
+		builder.Prompts.text(session, msg);
 	},
 	(session, result) => {
 		currentClaim = createClaimObject(session);
