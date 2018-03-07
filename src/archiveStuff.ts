@@ -75,3 +75,32 @@
 	// 	session.send(`Ok, deine wahl war, ${result}`);
 	// 	session.endDialog();
 	// }
+
+	// https://stackoverflow.com/questions/44407242/multiple-buttons-in-herocard
+	// bot.dialog("/showCards", [
+	// 	(session) => {
+	// 		const msg = new Message(session)
+	// 			.textFormat(TextFormat.xml)
+	// 			.attachmentLayout(AttachmentLayout.carousel)
+	// 			.attachments([{
+	// 				title: "title",
+	// 				url: "https://www.wikipedia.org/portal/wikipedia.org/assets/img/Wikipedia-logo-v2.png"
+	// 			}].map(obj =>
+	// 				new HeroCard(session)
+	// 					.title(obj.title)
+	// 					.images([
+	// 						CardImage.create(session, obj.url)
+	// 							.tap(CardAction.showImage(session, obj.url)),
+	// 					])
+	// 					.buttons([
+	// 						CardAction.openUrl(session, obj.url),
+	// 						CardAction.imBack(session, `click`, "Click"),
+	// 						CardAction.imBack(session, `clack`, "Clack")
+	// 					])
+	// 			));
+	// 		Prompts.choice(session, msg, ["click", "clack"]);
+	// 	},
+	// 	(session, results) => {
+	// 		// todo use results.response.entity
+	// 	}
+	// ])
