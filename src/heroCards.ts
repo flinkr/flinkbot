@@ -11,7 +11,7 @@ export function createHeroCard_damageType(session: builder.Session): any {
 		// ])
 		.buttons([
 			builder.CardAction.imBack(session, `Sachen von jemand anderem beschädigt`, "Sachen von jemand anderem beschädigt"),
-			builder.CardAction.imBack(session, `Schaden an Mietwohnung`, "Schaden an Mietwohnung"),
+			builder.CardAction.imBack(session, `Schaden an Mietwoh`, "Schaden an Mietwoh"),
 			builder.CardAction.imBack(session, `Ich habe jemanden verletzt`, "Ich habe jemanden verletzt"),
 		]);
 }
