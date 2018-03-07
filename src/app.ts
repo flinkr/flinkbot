@@ -37,37 +37,44 @@ const conn = new builder.ChatConnector({
 const LuisModelUrl = process.env.LUIS_MODEL_URL;
 
 const bot = new builder.UniversalBot(conn).set("storage", cosmosStorage);
-bot.recognizer(new builder.LuisRecognizer(LuisModelUrl));
+bot.recognizer(new builder.LuisRecognizer(LuisModelUrl)
+	// filter low confidence message and route them to default
+	.onFilter((context, result, callback) => {
+		if (result.intent !== "None" && result.score < 0.8) {
+			callback(null, { score: 0.0, intent: "Hello" });
+		} else {
+			callback(null, result);
+		}
+	}),
+);
 server.post("/api/messages", conn.listen());
 
-// bot.use({
-// 	botbuilder: (session, next) => {
-// 		// middleware.logIncomingMessage(session, next);
-// 		middleware.routeMessage(session, next);
-// 	},
-// 	send: (event, next) => {
-// 		// middleware.logOutgoingMessage(event, next);
-// 		next();
-// 	},
-// });
+bot.use({
+	botbuilder: (session, next) => {
+		middleware.routeMessage(session, next);
+	},
+});
 
 function getEntity(botbuilder: any, args: any, entity: string): string {
 	return botbuilder.EntityRecognizer.findEntity(args.intent.entities.entities);
 }
 
-
+function forwardIfLowConfidence(session: builder.Session, args: any): void {
+	console.log("dialog was handed over because confidence is" + args.intent.score)
+	session.beginDialog("/handOverToHuman");
+}
 
 bot.dialog("/Hallo", [
 	(session, args) => {
+		// console.log("This is confidence level "+util.inspect(args.intent.score));
 		console.log("hello was matched");
-		// session.send(`Hallo, wie kann ich helfen?`);
+		session.send(`Hallo, wie kann ich helfen?`);
 		// const msg = new builder.Message(session).addAttachment(heroCards.createHeroCard_damageType(session));
 		// builder.Prompts.text(session, msg);
-		
 	},
-	(session, result, args) => {
-		session.send(`step 2 ${result.response}`);
-	},
+	// (session, result, args) => {
+	// 	session.send(`step 2 ${result.response}`);
+	// },
 ]).triggerAction({ matches: "Hallo" });
 
 bot.dialog("/Login",
@@ -129,11 +136,7 @@ bot.dialog("/setUsername", [
 
 bot.dialog("/", [
 	(sess, args, next) => {
-		builder.Prompts.text(sess, "Hi, this is de default / route. You should not end up here, blame timo");
-	},
-	(sess, result) => {
-		sess.userData.name = result.response;
-		sess.endDialog();
+		sess.beginDialog("/handOverToHuman");
 	},
 ]);
 
@@ -150,7 +153,7 @@ function createClaimObject(session: builder.Session): string {
 let currentClaim = "notSetYet";
 bot.dialog("/Schaden melden", [
 	(session, args, next) => {
-		types: mieterschaden, sachschaden, privathaftpflicht
+		// types: mieterschaden, sachschaden, privathaftpflicht
 		builder.Prompts.choice(
 			session, "Was ist passiert?",
 			["Jemand verletzt", "etwas Kaputt", "Jemanden verletzt"],
