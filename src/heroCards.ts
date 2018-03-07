@@ -15,7 +15,9 @@ export function createHeroCard_damageType(session: builder.Session): any {
 			builder.CardAction.imBack(session, `Ich habe jemanden verletzt`, "Ich habe jemanden verletzt"),
 		]);
 }
-
+// Use like this:
+// const msg = new builder.Message(session).addAttachment(heroCards.createHeroCard_damageType(session));
+// builder.Prompts.text(session, msg);
 // Template:
 // export function createHeroCard_damageType(session: builder.Session): any {
 // 	return new builder.HeroCard(session)

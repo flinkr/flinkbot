@@ -63,14 +63,7 @@ bot.dialog("/Hallo", [
 		// session.send(`Hallo, wie kann ich helfen?`);
 		// const msg = new builder.Message(session).addAttachment(heroCards.createHeroCard_damageType(session));
 		// builder.Prompts.text(session, msg);
-		builder.Prompts.choice(
-			session, "Um welche Art von Schaden handelt es sich?",
-			["Sachen von jemand", "Schaden", "Ich habe jemanden verletzt"],
-			{
-				maxRetries: 3,
-				retryPrompt: "Not a valid option",
-				listStyle: 3,
-			});
+		
 	},
 	(session, result, args) => {
 		session.send(`step 2 ${result.response}`);
@@ -157,9 +150,27 @@ function createClaimObject(session: builder.Session): string {
 let currentClaim = "notSetYet";
 bot.dialog("/Schaden melden", [
 	(session, args, next) => {
-		const msg = new builder.Message(session).addAttachment(heroCards.createHeroCard_damageType(session));
-		builder.Prompts.text(session, msg);
+		types: mieterschaden, sachschaden, privathaftpflicht
+		builder.Prompts.choice(
+			session, "Was ist passiert?",
+			["Jemand verletzt", "etwas Kaputt", "Jemanden verletzt"],
+			{
+				maxRetries: 3,
+				retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus",
+				listStyle: 3,
+			});
 	},
+	(session, args, next) => {
+		builder.Prompts.choice(
+			session, "Um welche Art von Schaden handelt es sich?",
+			["Sachen von jemand", "Mieterschaden", "Jemanden verletzt"],
+			{
+				maxRetries: 3,
+				retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus",
+				listStyle: 3,
+			});
+	},
+
 	(session, result) => {
 		currentClaim = createClaimObject(session);
 		console.log("This is claim object: " + currentClaim);
