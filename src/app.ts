@@ -39,15 +39,16 @@ const bot = new builder.UniversalBot(conn).set("storage", cosmosStorage);
 bot.recognizer(new builder.LuisRecognizer(LuisModelUrl));
 server.post("/api/messages", conn.listen());
 
-bot.use({
-	botbuilder: (session, next) => {
-		// middleware.logIncomingMessage(session, next);
-		middleware.routeMessage(session, next);
-	},
-	send: (event, next) => {
-		middleware.logOutgoingMessage(event, next);
-	},
-});
+// bot.use({
+// 	botbuilder: (session, next) => {
+// 		// middleware.logIncomingMessage(session, next);
+// 		middleware.routeMessage(session, next);
+// 	},
+// 	send: (event, next) => {
+// 		// middleware.logOutgoingMessage(event, next);
+// 		next();
+// 	},
+// });
 
 function getEntity(botbuilder: any, args: any, entity: string): string {
 	return botbuilder.EntityRecognizer.findEntity(args.intent.entities.entities);
@@ -71,8 +72,8 @@ function createHeroCard(session: builder.Session): any {
 bot.dialog("/Hallo",
 	(session, args) => {
 		console.log("hello was matched");
-		// session.send(createHeroCard(session));
-		session.send(`Hallo, wie kann ich helfen?`);
+		session.send(createHeroCard(session));
+		// session.send(`Hallo, wie kann ich helfen?`);
 		session.endDialog();
 	},
 ).triggerAction({ matches: "Hallo" });
