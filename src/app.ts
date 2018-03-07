@@ -62,7 +62,7 @@ function createHeroCard(session: builder.Session): any {
 			builder.CardImage.create(session, "https://sec.ch9.ms/ch9/7ff5/e07cfef0-aa3b-40bb-9baa-7c9ef8ff7ff5/buildreactionbotframework_960.jpg"),
 		])
 		.buttons([
-			builder.CardAction.openUrl(session, "https://docs.microsoft.com/bot-framework", "Get Started"),
+			builder.CardAction.openUrl(session, "https://www.goflink.ch", "Get Started"),
 			builder.CardAction.imBack(session, `click`, "Click"),
 			builder.CardAction.imBack(session, `clack`, "Clack"),
 		]);
@@ -71,8 +71,8 @@ function createHeroCard(session: builder.Session): any {
 bot.dialog("/Hallo",
 	(session, args) => {
 		console.log("hello was matched");
-		session.send(createHeroCard(session));
-		// session.send(`Hallo, wie kann ich helfen?`);
+		// session.send(createHeroCard(session));
+		session.send(`Hallo, wie kann ich helfen?`);
 		session.endDialog();
 	},
 ).triggerAction({ matches: "Hallo" });
