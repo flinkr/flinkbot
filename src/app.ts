@@ -40,7 +40,7 @@ const bot = new builder.UniversalBot(conn).set("storage", cosmosStorage);
 bot.recognizer(new builder.LuisRecognizer(LuisModelUrl)
 	// filter low confidence message and route them to default
 	.onFilter((context, result, callback) => {
-		if (result.intent !== "None" && result.score < 0.8) {
+		if (result.intent !== "None" && result.score < 0.1) {
 			callback(null, { score: 0.0, intent: "Hello" });
 		} else {
 			callback(null, result);
