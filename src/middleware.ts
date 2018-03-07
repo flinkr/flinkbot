@@ -19,7 +19,7 @@ export function routeMessage(session: any, next: any): void {
 		// 	// send to bot
 		// 	next();
 		case "handedToHuman":
-			// session.send("ich leite dich an jemanden vom Flink Team weiter");
+			console.log("handed to human");
 			// don't do anything
 			return;
 		default:
