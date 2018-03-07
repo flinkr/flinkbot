@@ -6,6 +6,7 @@ import * as util from "util";
 import * as flinkapi from "./flinkapi";
 import * as dateExtractor from "./dateExtractor";
 import * as fb_attachments from "./fb_attachments";
+import * as heroCards from "./heroCards";
 import * as middleware from "./middleware";
 // tslint:disable-next-line:no-var-requires
 const azure = require("botbuilder-azure");
@@ -69,14 +70,17 @@ function createHeroCard(session: builder.Session): any {
 		]);
 }
 
-bot.dialog("/Hallo",
+bot.dialog("/Hallo", [
 	(session, args) => {
 		console.log("hello was matched");
-		session.send(createHeroCard(session));
 		// session.send(`Hallo, wie kann ich helfen?`);
-		session.endDialog();
+		const msg = new builder.Message(session).addAttachment(heroCards.createHeroCard_damageType(session));
+		builder.Prompts.text(session, msg);
 	},
-).triggerAction({ matches: "Hallo" });
+	(session, result, args) => {
+		session.send(`step 2 ${result.response}`);
+	},
+]).triggerAction({ matches: "Hallo" });
 
 bot.dialog("/Login",
 	(session, args) => {
@@ -158,15 +162,8 @@ function createClaimObject(session: builder.Session): string {
 let currentClaim = "notSetYet";
 bot.dialog("/Schaden melden", [
 	(session, args, next) => {
-		// prompt for search option
-		builder.Prompts.choice(
-			session, "Um welche Art von Schaden handelt es sich?",
-			["Sachen von jemand anderem beschädigt", "Schaden an Mietwohnung", "Ich habe jemanden verletzt"],
-			{
-				maxRetries: 3,
-				retryPrompt: "Not a valid option",
-				listStyle: 3,
-			});
+		const msg = new builder.Message(session).addAttachment(heroCards.createHeroCard_damageType(session));
+		session.send(msg);
 	},
 	(session, result) => {
 		currentClaim = createClaimObject(session);
