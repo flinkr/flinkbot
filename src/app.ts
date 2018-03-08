@@ -60,7 +60,7 @@ function getEntity(botbuilder: any, args: any, entity: string): string {
 }
 
 function forwardIfLowConfidence(session: builder.Session, args: any): void {
-	console.log("dialog was handed over because confidence is" + args.intent.score)
+	console.log("dialog was handed over because confidence is" + args.intent.score);
 	session.beginDialog("/handOverToHuman");
 }
 
@@ -154,9 +154,37 @@ let currentClaim = "notSetYet";
 bot.dialog("/Schaden melden", [
 	(session, args, next) => {
 		// types: mieterschaden, sachschaden, privathaftpflicht
+		// etwas kaputt gegangen
 		builder.Prompts.choice(
-			session, "Was ist passiert?",
-			["Jemand verletzt", "etwas Kaputt", "Jemanden verletzt"],
+			session, "Was ist passiert? \n\n Wurde jemand verletzt oder ist etwas kaputtgegangen?",
+			["Etwas kaputt", "Jemand verletzt"],
+			{
+				maxRetries: 3,
+				retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus",
+				listStyle: 3,
+			});
+	},
+	(session, result, next) => {
+		currentClaim = createClaimObject(session);
+		console.log("This is claim object: " + currentClaim);
+		if (result.response === "Etwas kaputt") {
+			builder.Prompts.choice(
+				session, "Wem gehört das beschädigte Objekt?",
+				["Mir", "Meinem Vermieter", "Jemanden anderem"],
+				{
+					maxRetries: 3,
+					retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus, falls du nicht weiterkommst, schreibe hilfe",
+					listStyle: 3,
+				});
+		} else {
+			session.userData[currentClaim].type = "Personenschaden";
+			next();
+		}
+	},
+	(session, args, next) => {
+		builder.Prompts.choice(
+			session, "Wo ist es passiert?",
+			["Bei mir zuhause", "Auswärts"],
 			{
 				maxRetries: 3,
 				retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus",
@@ -165,19 +193,16 @@ bot.dialog("/Schaden melden", [
 	},
 	(session, args, next) => {
 		builder.Prompts.choice(
-			session, "Um welche Art von Schaden handelt es sich?",
-			["Sachen von jemand", "Mieterschaden", "Jemanden verletzt"],
+			session, "Wo ist es passiert?",
+			["Bei mir zuhause", "Auswärts"],
 			{
 				maxRetries: 3,
 				retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus",
 				listStyle: 3,
 			});
 	},
-
 	(session, result) => {
-		currentClaim = createClaimObject(session);
-		console.log("This is claim object: " + currentClaim);
-		session.userData[currentClaim].type = result.response.entity;
+		session.userData[currentClaim].location = result.response;
 		builder.Prompts.text(session, "An welchem Datum ist es passiert?");
 	},
 	(session, result, next) => {
