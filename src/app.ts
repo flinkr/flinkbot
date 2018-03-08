@@ -179,10 +179,11 @@ bot.dialog("/Schaden melden", [
 					});
 				session.userData[currentClaim].type = "Hausratschaden";
 			case "Jemand verletzt":
-				session.beginDialog("/personenSchaden continued");
+				session.replaceDialog("/personenSchaden continued");
 			case "Diebstahl":
 				next();
 			default:
+				console.log("........there was an error reached default!");
 				next();
 		}
 	},
@@ -197,6 +198,7 @@ bot.dialog("/Schaden melden", [
 			case "Jemand anderem":
 				session.userData[currentClaim].type = "Haftpflicht Sachschaden";
 			default:
+				session.userData[currentClaim].type = "Diebstahl";
 				next();
 		}
 	},
