@@ -41,7 +41,7 @@ bot.recognizer(new builder.LuisRecognizer(LuisModelUrl)
 	// filter low confidence message and route them to default see https://github.com/Microsoft/BotBuilder/issues/3530
 	.onFilter((context, result, callback) => {
 		if (result.intent !== "None" && result.score < 0.1) {
-			callback(null, { score: 0.0, intent: "Hello" });
+			callback(null, { score: 0.0, intent: "abc" });
 		} else {
 			callback(null, result);
 		}
@@ -66,7 +66,6 @@ function forwardIfLowConfidence(session: builder.Session, args: any): void {
 
 bot.dialog("/Hallo", [
 	(session, args) => {
-		// console.log("This is confidence level "+util.inspect(args.intent.score));
 		console.log("hello was matched");
 		session.send(`Hallo, wie kann ich helfen?`);
 		// const msg = new builder.Message(session).addAttachment(heroCards.createHeroCard_damageType(session));
@@ -142,7 +141,7 @@ bot.dialog("/", [
 
 let currentClaim = "notSetYet";
 function createClaimObject(session: builder.Session): string {
-	for (let i = 1; i < 10; i++) {
+	for (let i = 1; i < 100; i++) {
 		if (!session.userData["claim" + i]) {
 			session.userData["claim" + i] = {};
 			return "claim" + i;
@@ -154,6 +153,9 @@ function createClaimObject(session: builder.Session): string {
 
 bot.dialog("/Schaden melden", [
 	(session, args, next) => {
+		// Give the claim a new ID
+		currentClaim = createClaimObject(session);
+		console.log("This is current claim" + currentClaim);
 		builder.Prompts.choice(
 			session, "Was ist passiert? \n\n Wurde jemand verletzt,ist etwas kaputt gegangen oder ist dir etwas gestohlen worden?",
 			["Etwas kaputt", "Jemand verletzt", "Diebstahl"],
@@ -164,37 +166,27 @@ bot.dialog("/Schaden melden", [
 			});
 	},
 	(session, result, next) => {
-		currentClaim = createClaimObject(session);
-		console.log("This is claim object: " + currentClaim);
-		switch (result.response) {
+		console.log("response is: " + result.response.entity);
+		switch (result.response.entity) {
 			case "Etwas kaputt":
 				session.beginDialog("/get damageOwner");
 				session.userData[currentClaim].type = "Hausratschaden";
+				next();
+				break;
 			case "Jemand verletzt":
 				session.replaceDialog("/personenSchaden continued");
+				next();
+				break;
 			case "Diebstahl":
 				session.beginDialog("/get theftLocation");
+				next();
+				break;
 			default:
 				console.log("........there was an error reached default!");
 				session.userData[currentClaim].type = "Diebstahl";
 				next();
 		}
 	},
-	(session, result, next) => {
-		currentClaim = createClaimObject(session);
-		console.log("This is claim object: " + currentClaim);
-	},
-	(session, args, next) => {
-		builder.Prompts.choice(
-			session, "Wo ist es passiert?",
-			["Bei mir zuhause", "Auswärts"],
-			{
-				maxRetries: 3,
-				retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus",
-				listStyle: 3,
-			});
-	},
-
 	(session, result) => {
 		session.userData[currentClaim].location = result.response;
 		builder.Prompts.text(session, "An welchem Datum ist es passiert?");
@@ -275,18 +267,18 @@ bot.dialog("/get damageOwner", [
 			});
 	},
 	(session, result, next) => {
-		switch (result.response) {
+		switch (result.response.entity) {
 			case "Mir":
 				session.userData[currentClaim].type = "Hausratschaden";
-				console.log("DATABASE NEW ENTRY: Type: " + session.userData[currentClaim].type);
+				console.log('1b[36m%s1b[0m', "DATABASE NEW ENTRY: Type: " + session.userData[currentClaim].type);
 				session.beginDialog("/get damageLocation");
 			case "Meinem Vermieter":
 				session.userData[currentClaim].type = "Mieterschaden";
-				console.log("DATABASE NEW ENTRY: Type: " + session.userData[currentClaim].type);
+				console.log('1b[36m%s1b[0m', "DATABASE NEW ENTRY: Type: " + session.userData[currentClaim].type);
 				session.beginDialog("/get renterContact");
 			case "Jemand anderem":
 				session.userData[currentClaim].type = "Haftpflicht Sachschaden";
-				console.log("DATABASE NEW ENTRY: Type: " + session.userData[currentClaim].type);
+				console.log('1b[36m%s1b[0m', "DATABASE NEW ENTRY: Type: " + session.userData[currentClaim].type);
 				session.beginDialog("/get liabilityContact");
 			default:
 				console.log("ERROR: error default was reached, should not happen");
@@ -301,7 +293,7 @@ bot.dialog("/get renterContact", [
 	},
 	(session, result, next) => {
 		session.userData[currentClaim].renter = result.response;
-		console.log("DATABASE NEW ENTRY: renterContact: " + session.userData[currentClaim].renterContact);
+		console.log('1b[36m%s1b[0m', "DATABASE NEW ENTRY: renterContact: " + session.userData[currentClaim].renterContact);
 		session.endDialog();
 	},
 ]);
@@ -312,7 +304,7 @@ bot.dialog("/get liabilityContact", [
 	},
 	(session, result, next) => {
 		session.userData[currentClaim].renter = result.response;
-		console.log("DATABASE NEW ENTRY: liabilityContact: " + session.userData[currentClaim].liabilityContact);
+		console.log('1b[36m%s1b[0m', "DATABASE NEW ENTRY: liabilityContact: " + session.userData[currentClaim].liabilityContact);
 		session.endDialog();
 	},
 ]);
@@ -321,7 +313,7 @@ bot.dialog("/get damageLocation", [
 	(session, args, next) => {
 		builder.Prompts.choice(
 			session, "Wo ist es passiert?",
-			["Bei mir zuhause", "Auswärts"],
+			["Bei mir zuhause", "Auswärts/Unterwegs"],
 			{
 				maxRetries: 3,
 				retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus",
@@ -329,13 +321,12 @@ bot.dialog("/get damageLocation", [
 			});
 	},
 	(session, result, next) => {
-		switch (result.response) {
-			case "Bei mir zuhause":
-				session.userData[currentClaim].type = "Hausratschaden";
+		switch (result.response.entity) {
 			case "Auswärts":
-				session.userData[currentClaim].type = "Mieterschaden";
+				session.userData[currentClaim].auswärts = true;
+				console.log('1b[36m%s1b[0m', 'DATABASE NEW ENTRY: type: ' + session.userData[currentClaim].litypeabilityContact);
 			default:
-				console.log("error default was reached, should not happen");
+				console.log("Not auswärts => continue");
 		}
 		session.endDialog();
 	},
@@ -353,11 +344,13 @@ bot.dialog("/get theftLocation", [
 			});
 	},
 	(session, result, next) => {
-		switch (result.response) {
+		switch (result.response.entity) {
 			case "Auswärts":
 				session.userData[currentClaim].type = "Diebstahl auswärts";
+				console.log('1b[36m%s1b[0m', 'DATABASE NEW ENTRY: type: ' + session.userData[currentClaim].type);
+				break;
 			default:
-				console.log("error default was reached, should not happen");
+				console.log("Response was bei mir zuhause");
 		}
 		session.endDialog();
 	},
