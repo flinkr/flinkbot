@@ -156,29 +156,48 @@ bot.dialog("/Schaden melden", [
 		// types: mieterschaden, sachschaden, privathaftpflicht
 		// etwas kaputt gegangen
 		builder.Prompts.choice(
-			session, "Was ist passiert? \n\n Wurde jemand verletzt oder ist etwas kaputtgegangen?",
-			["Etwas kaputt", "Jemand verletzt"],
+			session, "Was ist passiert? \n\n Wurde jemand verletzt,ist etwas kaputtgegangen oder gestohlen worden?",
+			["Etwas kaputt", "Jemand verletzt", "Diebstahl"],
 			{
 				maxRetries: 3,
-				retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus",
+				retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus, falls du nicht weiterkommst, schreibe hilfe",
 				listStyle: 3,
 			});
 	},
 	(session, result, next) => {
 		currentClaim = createClaimObject(session);
 		console.log("This is claim object: " + currentClaim);
-		if (result.response === "Etwas kaputt") {
-			builder.Prompts.choice(
-				session, "Wem gehört das beschädigte Objekt?",
-				["Mir", "Meinem Vermieter", "Jemanden anderem"],
-				{
-					maxRetries: 3,
-					retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus, falls du nicht weiterkommst, schreibe hilfe",
-					listStyle: 3,
-				});
-		} else {
-			session.userData[currentClaim].type = "Personenschaden";
-			next();
+		switch (result.response) {
+			case "Etwas kaputt":
+				builder.Prompts.choice(
+					session, "Wem gehört das beschädigte Objekt?",
+					["Mir", "Meinem Vermieter", "Jemanden anderem"],
+					{
+						maxRetries: 3,
+						retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus, falls du nicht weiterkommst, schreibe hilfe",
+						listStyle: 3,
+					});
+				session.userData[currentClaim].type = "Hausratschaden";
+			case "Jemand verletzt":
+				session.beginDialog("/personenSchaden continued");
+			case "Diebstahl":
+				next();
+			default:
+				next();
+		}
+	},
+	(session, result, next) => {
+		currentClaim = createClaimObject(session);
+		console.log("This is claim object: " + currentClaim);
+		switch (result.response) {
+			case "Mir":
+				session.userData[currentClaim].type = "Hausratschaden";
+			case "Meinem Vermieter":
+				session.userData[currentClaim].type = "Mieterschaden";
+			case "Jemand anderem":
+				session.userData[currentClaim].type = "Haftpflicht Sachschaden";
+			default:
+				next();
 		}
 	},
 	(session, args, next) => {
@@ -225,17 +244,17 @@ bot.dialog("/Schaden melden", [
 			}
 		});
 	},
-	(session, result, next) => {
-		builder.Prompts.text(session, "Bitte gib noch eine kurze Beschreibung, was passiert ist?");
-	},
 	// Mieterschaden
 	(session, result, next) => {
 		session.userData[currentClaim].description = result.response;
 		if (session.userData[currentClaim].type === "Mieterschaden") {
-			builder.Prompts.text(session, "Bitte gib noch die Kontaktdaten des Vermieters an");
+			builder.Prompts.text(session, "Bitte gib noch die Kontaktdaten des Vermieters (Telefonnummer oder Email) an");
 		} else {
 			next();
 		}
+	},
+	(session, result, next) => {
+		builder.Prompts.text(session, "Bitte gib noch eine kurze Beschreibung, was passiert ist?");
 	},
 	(session, result) => {
 		session.userData[currentClaim].lenderContact = result.response;
@@ -249,8 +268,25 @@ bot.dialog("/Schaden melden", [
 		session.userData.phone = result.response;
 		session.send("fertig, wurde eingereicht").endDialog();
 	},
-
 ]).triggerAction({ matches: "Schaden melden" });
+
+bot.dialog("/personenSchaden continued", [
+	(session, args, next) => {
+		session.userData[currentClaim].type = "Personenschaden";
+		builder.Prompts.text(session, "Bitte gib die Kontaktdaten der beschädigten Person an (Name, Telefon/Email)");
+	},
+	(session, result, next) => {
+		builder.Prompts.text(session, "Bitte gib noch eine kurze Beschreibung, was passiert ist?");
+	},
+	(session, result) => {
+		session.userData[currentClaim].description = "Personenschaden";
+		builder.Prompts.text(session, "Wie ist deine Telefonnummer für allfällige Rückfragen?");
+	},
+	(session, result) => {
+		session.userData.phone = result.response;
+		session.send("fertig, wurde eingereicht").endDialog();
+	},
+]);
 
 bot.dialog("/testDateInput", [
 	(session, args, next) => {
