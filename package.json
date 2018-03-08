@@ -14,6 +14,7 @@
     "@types/tedious": "^1.8.32",
     "botbuilder": "^3.14.0",
     "botbuilder-azure": "^3.0.4",
+    "colors": "^1.1.2",
     "dotenv": "^5.0.0",
     "request-promise": "^4.2.2",
     "restify": "^6.3.4",
@@ -38,11 +39,8 @@
   "bugs": {
     "url": "https://gitlab.com/goflink/flinkbot/issues"
   },
-  "homepage": "https://gitlab.com/goflink/flinkbot#README"
+  "homepage": "https://gitlab.com/goflink/flinkbot#README",
+  "devDependencies": {
+    "@types/colors": "^1.1.3"
+  }
 }
-  
-
-
-
-
-

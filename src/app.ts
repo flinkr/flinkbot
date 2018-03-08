@@ -1,5 +1,4 @@
 import * as builder from "botbuilder";
-// import * as azure from "botbuilder-azure";
 import * as dotenv from "dotenv";
 import * as restify from "restify";
 import * as util from "util";
@@ -8,9 +7,11 @@ import * as dateExtractor from "./dateExtractor";
 import * as fb_attachments from "./fb_attachments";
 import * as heroCards from "./heroCards";
 import * as middleware from "./middleware";
-// tslint:disable-next-line:no-var-requires
-const azure = require("botbuilder-azure");
+import colors = require("colors");
+import azure = require("botbuilder-azure");
+
 dotenv.config();
+colors.enabled = true;
 
 const documentDbOptions = {
 	host: process.env.COSMOS_HOST,
@@ -66,7 +67,9 @@ function forwardIfLowConfidence(session: builder.Session, args: any): void {
 
 bot.dialog("/Hallo", [
 	(session, args) => {
-		console.log("hello was matched");
+		// console.log('1b[36m%s1b[0m', 'Hello');
+		console.log("hello".green);
+		// console.log("hello was matched");
 		session.send(`Hallo, wie kann ich helfen?`);
 		// const msg = new builder.Message(session).addAttachment(heroCards.createHeroCard_damageType(session));
 		// builder.Prompts.text(session, msg);
@@ -270,7 +273,7 @@ bot.dialog("/get damageOwner", [
 		switch (result.response.entity) {
 			case "Mir":
 				session.userData[currentClaim].type = "Hausratschaden";
-				console.log('1b[36m%s1b[0m', "DATABASE NEW ENTRY: Type: " + session.userData[currentClaim].type);
+				console.log('\x1b[36m%s\x1b[0m', "DATABASE NEW ENTRY: Type: " + session.userData[currentClaim].type);
 				session.beginDialog("/get damageLocation");
 			case "Meinem Vermieter":
 				session.userData[currentClaim].type = "Mieterschaden";
