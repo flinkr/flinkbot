@@ -140,6 +140,7 @@ bot.dialog("/", [
 	},
 ]);
 
+let currentClaim = "notSetYet";
 function createClaimObject(session: builder.Session): string {
 	for (let i = 1; i < 10; i++) {
 		if (!session.userData["claim" + i]) {
@@ -150,17 +151,15 @@ function createClaimObject(session: builder.Session): string {
 }
 
 // Requirements on data to gather: https://docs.google.com/document/d/11pIyiS-iEqyGg6eaqsPiSQPk5rXXyDPoc4Rtx01AkYk/edit
-let currentClaim = "notSetYet";
+
 bot.dialog("/Schaden melden", [
 	(session, args, next) => {
-		// types: mieterschaden, sachschaden, privathaftpflicht
-		// etwas kaputt gegangen
 		builder.Prompts.choice(
-			session, "Was ist passiert? \n\n Wurde jemand verletzt,ist etwas kaputtgegangen oder gestohlen worden?",
+			session, "Was ist passiert? \n\n Wurde jemand verletzt,ist etwas kaputt gegangen oder ist dir etwas gestohlen worden?",
 			["Etwas kaputt", "Jemand verletzt", "Diebstahl"],
 			{
 				maxRetries: 3,
-				retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus, falls du nicht weiterkommst, schreibe hilfe",
+				retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus, falls du nicht weiterkommst, schreibe Hilfe",
 				listStyle: 3,
 			});
 	},
@@ -169,38 +168,21 @@ bot.dialog("/Schaden melden", [
 		console.log("This is claim object: " + currentClaim);
 		switch (result.response) {
 			case "Etwas kaputt":
-				builder.Prompts.choice(
-					session, "Wem gehört das beschädigte Objekt?",
-					["Mir", "Meinem Vermieter", "Jemanden anderem"],
-					{
-						maxRetries: 3,
-						retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus, falls du nicht weiterkommst, schreibe hilfe",
-						listStyle: 3,
-					});
+				session.beginDialog("/get damageOwner");
 				session.userData[currentClaim].type = "Hausratschaden";
 			case "Jemand verletzt":
 				session.replaceDialog("/personenSchaden continued");
 			case "Diebstahl":
-				next();
+				session.beginDialog("/get theftLocation");
 			default:
 				console.log("........there was an error reached default!");
+				session.userData[currentClaim].type = "Diebstahl";
 				next();
 		}
 	},
 	(session, result, next) => {
 		currentClaim = createClaimObject(session);
 		console.log("This is claim object: " + currentClaim);
-		switch (result.response) {
-			case "Mir":
-				session.userData[currentClaim].type = "Hausratschaden";
-			case "Meinem Vermieter":
-				session.userData[currentClaim].type = "Mieterschaden";
-			case "Jemand anderem":
-				session.userData[currentClaim].type = "Haftpflicht Sachschaden";
-			default:
-				session.userData[currentClaim].type = "Diebstahl";
-				next();
-		}
 	},
 	(session, args, next) => {
 		builder.Prompts.choice(
@@ -212,16 +194,7 @@ bot.dialog("/Schaden melden", [
 				listStyle: 3,
 			});
 	},
-	(session, args, next) => {
-		builder.Prompts.choice(
-			session, "Wo ist es passiert?",
-			["Bei mir zuhause", "Auswärts"],
-			{
-				maxRetries: 3,
-				retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus",
-				listStyle: 3,
-			});
-	},
+
 	(session, result) => {
 		session.userData[currentClaim].location = result.response;
 		builder.Prompts.text(session, "An welchem Datum ist es passiert?");
@@ -287,6 +260,106 @@ bot.dialog("/personenSchaden continued", [
 	(session, result) => {
 		session.userData.phone = result.response;
 		session.send("fertig, wurde eingereicht").endDialog();
+	},
+]);
+
+bot.dialog("/get damageOwner", [
+	(session, args, next) => {
+		builder.Prompts.choice(
+			session, "Wem gehört das beschädigte Objekt?",
+			["Mir", "Meinem Vermieter", "Jemanden anderem"],
+			{
+				maxRetries: 3,
+				retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus, falls du nicht weiterkommst, schreibe Hilfe",
+				listStyle: 3,
+			});
+	},
+	(session, result, next) => {
+		switch (result.response) {
+			case "Mir":
+				session.userData[currentClaim].type = "Hausratschaden";
+				console.log("DATABASE NEW ENTRY: Type: " + session.userData[currentClaim].type);
+				session.beginDialog("/get damageLocation");
+			case "Meinem Vermieter":
+				session.userData[currentClaim].type = "Mieterschaden";
+				console.log("DATABASE NEW ENTRY: Type: " + session.userData[currentClaim].type);
+				session.beginDialog("/get renterContact");
+			case "Jemand anderem":
+				session.userData[currentClaim].type = "Haftpflicht Sachschaden";
+				console.log("DATABASE NEW ENTRY: Type: " + session.userData[currentClaim].type);
+				session.beginDialog("/get liabilityContact");
+			default:
+				console.log("ERROR: error default was reached, should not happen");
+		}
+		session.endDialog();
+	},
+]);
+
+bot.dialog("/get renterContact", [
+	(session, args, next) => {
+		builder.Prompts.text(session, "Bitte gib die Kontaktdaten deines Vermieters an (Email oder Tel.Nr)?");
+	},
+	(session, result, next) => {
+		session.userData[currentClaim].renter = result.response;
+		console.log("DATABASE NEW ENTRY: renterContact: " + session.userData[currentClaim].renterContact);
+		session.endDialog();
+	},
+]);
+
+bot.dialog("/get liabilityContact", [
+	(session, args, next) => {
+		builder.Prompts.text(session, "Bitte gib die Kontaktdaten der geschädigten Person an (Email oder Tel.Nr)?");
+	},
+	(session, result, next) => {
+		session.userData[currentClaim].renter = result.response;
+		console.log("DATABASE NEW ENTRY: liabilityContact: " + session.userData[currentClaim].liabilityContact);
+		session.endDialog();
+	},
+]);
+
+bot.dialog("/get damageLocation", [
+	(session, args, next) => {
+		builder.Prompts.choice(
+			session, "Wo ist es passiert?",
+			["Bei mir zuhause", "Auswärts"],
+			{
+				maxRetries: 3,
+				retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus",
+				listStyle: 3,
+			});
+	},
+	(session, result, next) => {
+		switch (result.response) {
+			case "Bei mir zuhause":
+				session.userData[currentClaim].type = "Hausratschaden";
+			case "Auswärts":
+				session.userData[currentClaim].type = "Mieterschaden";
+			default:
+				console.log("error default was reached, should not happen");
+		}
+		session.endDialog();
+	},
+]);
+
+bot.dialog("/get theftLocation", [
+	(session, args, next) => {
+		builder.Prompts.choice(
+			session, "Wo ist es passiert?",
+			["Bei mir zuhause", "Auswärts"],
+			{
+				maxRetries: 3,
+				retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus",
+				listStyle: 3,
+			});
+	},
+	(session, result, next) => {
+		switch (result.response) {
+			case "Auswärts":
+				session.userData[currentClaim].type = "Diebstahl auswärts";
+			default:
+				console.log("error default was reached, should not happen");
+		}
+		session.endDialog();
 	},
 ]);
 
