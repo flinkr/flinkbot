@@ -231,7 +231,7 @@ bot.dialog("/Schaden melden", [
 	},
 	(session, result) => {
 		session.userData.phone = result.response;
-		session.send("fertig, wurde eingereicht").endDialog();
+		session.send(`fertig, wurde eingereicht, here is your claim data ${JSON.stringify(session.userData[currentClaim])}`).endDialog();
 	},
 ]).triggerAction({ matches: "Schaden melden" });
 
