@@ -14,6 +14,7 @@
         //   "./node_modules/botbuilder-azure/lib/botbuilder-azure.d.ts",
           "./node_modules/@types/restify/index.d.ts",
           "./node_modules/@types/dotenv/index.d.ts",
+          "./node_modules/@types/colors/index.d.ts",
           "./src/types.d.ts",
           
  

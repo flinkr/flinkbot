@@ -7,8 +7,10 @@ import * as dateExtractor from "./dateExtractor";
 import * as fb_attachments from "./fb_attachments";
 import * as heroCards from "./heroCards";
 import * as middleware from "./middleware";
-import colors = require("colors");
-import azure = require("botbuilder-azure");
+/* tslint:disable */
+const azure = require("botbuilder-azure");
+const colors = require("colors");
+/* tslint:enable */
 
 dotenv.config();
 colors.enabled = true;
@@ -23,6 +25,7 @@ const docDbClient = new azure.DocumentDbClient(documentDbOptions);
 const cosmosStorage = new azure.AzureBotStorage({ gzipData: false }, docDbClient);
 
 function logIntents(args: any): void {
+
 	console.log(args);
 	console.log(args.intent.intent);
 	console.log(args.intent.entities);
@@ -66,17 +69,10 @@ function forwardIfLowConfidence(session: builder.Session, args: any): void {
 }
 
 bot.dialog("/Hallo", [
-	(session, args) => {
-		// console.log('1b[36m%s1b[0m', 'Hello');
+	(session, args, next) => {
 		console.log("hello".green);
-		// console.log("hello was matched");
-		session.send(`Hallo, wie kann ich helfen?`);
-		// const msg = new builder.Message(session).addAttachment(heroCards.createHeroCard_damageType(session));
-		// builder.Prompts.text(session, msg);
+		session.send(`Hello, Dialog triggered`);
 	},
-	// (session, result, args) => {
-	// 	session.send(`step 2 ${result.response}`);
-	// },
 ]).triggerAction({ matches: "Hallo" });
 
 bot.dialog("/Login",
@@ -166,14 +162,14 @@ bot.dialog("/Schaden melden", [
 				maxRetries: 3,
 				retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus, falls du nicht weiterkommst, schreibe Hilfe",
 				listStyle: 3,
-			});
+			},
+		);
 	},
 	(session, result, next) => {
 		console.log("response is: " + result.response.entity);
 		switch (result.response.entity) {
 			case "Etwas kaputt":
-				session.beginDialog("/get damageOwner");
-				session.userData[currentClaim].type = "Hausratschaden";
+				session.beginDialog("/getDamageOwner");
 				next();
 				break;
 			case "Jemand verletzt":
@@ -181,7 +177,7 @@ bot.dialog("/Schaden melden", [
 				next();
 				break;
 			case "Diebstahl":
-				session.beginDialog("/get theftLocation");
+				session.beginDialog("/getTheftLocation");
 				next();
 				break;
 			default:
@@ -191,7 +187,6 @@ bot.dialog("/Schaden melden", [
 		}
 	},
 	(session, result) => {
-		session.userData[currentClaim].location = result.response;
 		builder.Prompts.text(session, "An welchem Datum ist es passiert?");
 	},
 	(session, result, next) => {
@@ -258,11 +253,11 @@ bot.dialog("/personenSchaden continued", [
 	},
 ]);
 
-bot.dialog("/get damageOwner", [
+bot.dialog("/getDamageOwner", [
 	(session, args, next) => {
 		builder.Prompts.choice(
 			session, "Wem gehört das beschädigte Objekt?",
-			["Mir", "Meinem Vermieter", "Jemanden anderem"],
+			["Mir", "Meinem Vermieter", "Jemand anderem"],
 			{
 				maxRetries: 3,
 				retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus, falls du nicht weiterkommst, schreibe Hilfe",
@@ -273,50 +268,52 @@ bot.dialog("/get damageOwner", [
 		switch (result.response.entity) {
 			case "Mir":
 				session.userData[currentClaim].type = "Hausratschaden";
-				console.log('\x1b[36m%s\x1b[0m', "DATABASE NEW ENTRY: Type: " + session.userData[currentClaim].type);
-				session.beginDialog("/get damageLocation");
+				console.log(`DATABASE NEW ENTRY: Type:  ${session.userData[currentClaim].type}`.cyan);
+				session.beginDialog("/getDamageLocation");
+				break;
 			case "Meinem Vermieter":
 				session.userData[currentClaim].type = "Mieterschaden";
-				console.log('1b[36m%s1b[0m', "DATABASE NEW ENTRY: Type: " + session.userData[currentClaim].type);
-				session.beginDialog("/get renterContact");
+				console.log(`DATABASE NEW ENTRY: Type:  ${session.userData[currentClaim].type}`.cyan);
+				session.beginDialog("/getRenterContact");
+				break;
 			case "Jemand anderem":
 				session.userData[currentClaim].type = "Haftpflicht Sachschaden";
-				console.log('1b[36m%s1b[0m', "DATABASE NEW ENTRY: Type: " + session.userData[currentClaim].type);
-				session.beginDialog("/get liabilityContact");
+				console.log(`DATABASE NEW ENTRY: Type:  ${session.userData[currentClaim].type}`.cyan);
+				session.beginDialog("/getLiabilityContact");
+				break;
 			default:
 				console.log("ERROR: error default was reached, should not happen");
 		}
-		session.endDialog();
 	},
 ]);
 
-bot.dialog("/get renterContact", [
+bot.dialog("/getRenterContact", [
 	(session, args, next) => {
 		builder.Prompts.text(session, "Bitte gib die Kontaktdaten deines Vermieters an (Email oder Tel.Nr)?");
 	},
 	(session, result, next) => {
-		session.userData[currentClaim].renter = result.response;
-		console.log('1b[36m%s1b[0m', "DATABASE NEW ENTRY: renterContact: " + session.userData[currentClaim].renterContact);
+		session.userData[currentClaim].renterContact = result.response;
+		console.log(`DATABASE NEW ENTRY: renterContact: ${session.userData[currentClaim].renterContact}`.cyan);
 		session.endDialog();
 	},
 ]);
 
-bot.dialog("/get liabilityContact", [
+bot.dialog("/getLiabilityContact", [
 	(session, args, next) => {
 		builder.Prompts.text(session, "Bitte gib die Kontaktdaten der geschädigten Person an (Email oder Tel.Nr)?");
 	},
 	(session, result, next) => {
-		session.userData[currentClaim].renter = result.response;
-		console.log('1b[36m%s1b[0m', "DATABASE NEW ENTRY: liabilityContact: " + session.userData[currentClaim].liabilityContact);
+		session.userData[currentClaim].liabilityContact = result.response;
+		console.log(`DATABASE NEW ENTRY: liabilityContact: ${session.userData[currentClaim].liabilityContact}`.cyan);
 		session.endDialog();
 	},
 ]);
 
-bot.dialog("/get damageLocation", [
+bot.dialog("/getTheftLocation", [
 	(session, args, next) => {
 		builder.Prompts.choice(
 			session, "Wo ist es passiert?",
-			["Bei mir zuhause", "Auswärts/Unterwegs"],
+			["zuhause", "unterwegs"],
 			{
 				maxRetries: 3,
 				retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus",
@@ -324,16 +321,50 @@ bot.dialog("/get damageLocation", [
 			});
 	},
 	(session, result, next) => {
-		switch (result.response.entity) {
-			case "Auswärts":
-				session.userData[currentClaim].auswärts = true;
-				console.log('1b[36m%s1b[0m', 'DATABASE NEW ENTRY: type: ' + session.userData[currentClaim].litypeabilityContact);
-			default:
-				console.log("Not auswärts => continue");
+		session.endDialog();
+	},
+]);
+
+bot.dialog("/getDamageLocation", [
+	(session, args, next) => {
+		builder.Prompts.choice(
+			session, "Wo ist es passiert?",
+			["zuhause", "unterwegs"],
+			{
+				maxRetries: 3,
+				retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus",
+				listStyle: 3,
+			});
+	},
+	(session, result, next) => {
+		if (result.response.entity === "zuhause") {
+			session.userData[currentClaim].location = "at Home";
+			console.log(`DATABASE NEW ENTRY: Type:  ${session.userData[currentClaim].location}`.cyan);
+			next();
+		} else {
+			builder.Prompts.text(session, "Wo ist es passiert (z.B. Zürich, St.Gallen)?");
+		}
+	},
+	(session, result, next) => {
+		// if not undefined => not zuhause
+		if (result.response) {
+			session.userData[currentClaim].location = result.response;
+			console.log(`DATABASE NEW ENTRY: Type:  ${session.userData[currentClaim].location}`.cyan);
 		}
 		session.endDialog();
 	},
 ]);
+
+// console.log(result.response);
+// switch (result.response.entity) {
+// 	case "Auswärts":
+// 		session.userData[currentClaim].auswärts = true;
+// 		console.log(`DATABASE NEW ENTRY: type: ${session.userData[currentClaim].litypeabilityContact}`.cyan);
+
+// 	default:
+// 		console.log("Not auswärts => continue");
+// }
+// session.endDialog();
 
 bot.dialog("/get theftLocation", [
 	(session, args, next) => {
@@ -350,7 +381,7 @@ bot.dialog("/get theftLocation", [
 		switch (result.response.entity) {
 			case "Auswärts":
 				session.userData[currentClaim].type = "Diebstahl auswärts";
-				console.log('1b[36m%s1b[0m', 'DATABASE NEW ENTRY: type: ' + session.userData[currentClaim].type);
+				console.log(`DATABASE NEW ENTRY: type: ${session.userData[currentClaim].type}`.cyan);
 				break;
 			default:
 				console.log("Response was bei mir zuhause");
