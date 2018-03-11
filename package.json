@@ -14,6 +14,7 @@
     "@types/tedious": "^1.8.32",
     "botbuilder": "^3.14.0",
     "botbuilder-azure": "^3.0.4",
+    "botbuilder-cognitiveservices": "^1.1.0",
     "colors": "^1.1.2",
     "dotenv": "^5.0.0",
     "request-promise": "^4.2.2",

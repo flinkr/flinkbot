@@ -1,3 +1,15 @@
+import * as builder from "botbuilder";
+
+export default (bot: builder.UniversalBot): void => {
+	bot.dialog("/Test", [
+		(session, args, next) => {
+			console.log("test".green);
+			session.send(`Test Dialog triggered`);
+		},
+	]).triggerAction({ matches: "test" });
+};
+
+// }
 // class TestDialog {
 
 // 	private bot: any;
@@ -26,3 +38,4 @@
 // 		},
 // 	]).triggerAction({ matches: "test" });
 // };
+

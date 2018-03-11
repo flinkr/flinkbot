@@ -7,11 +7,11 @@ import * as dateExtractor from "./dateExtractor";
 import * as fb_attachments from "./fb_attachments";
 import * as heroCards from "./heroCards";
 import * as middleware from "./middleware";
+import * as builder_cognitiveservices from "botbuilder-cognitiveservices";
 /* tslint:disable */
 const azure = require("botbuilder-azure");
 const colors = require("colors");
 /* tslint:enable */
-
 dotenv.config();
 colors.enabled = true;
 
@@ -44,11 +44,17 @@ const bot = new builder.UniversalBot(conn).set("storage", cosmosStorage);
 bot.recognizer(new builder.LuisRecognizer(LuisModelUrl)
 	// filter low confidence message and route them to default see https://github.com/Microsoft/BotBuilder/issues/3530
 	.onFilter((context, result, callback) => {
-		if (result.intent !== "None" && result.score < 0.1) {
-			callback(null, { score: 0.0, intent: "abc" });
-		} else {
-			callback(null, result);
+		console.log(JSON.stringify(result).cyan);
+		if (result.intent !== "None" && result.score < 0.0001) {
+			// use qnamaker if there is no good result from LUIS
+			result.intent = "QnA";
+			// callback(null, { score: 0.7, intent: "/Hallo" });
+		// } else {
+		// 	callback(null, result);
 		}
+		// result.intents[0].intent = "QnA";
+		console.log(JSON.stringify(result).red);
+		callback(null, result);
 	}),
 );
 server.post("/api/messages", conn.listen());
@@ -58,6 +64,26 @@ bot.use({
 		middleware.routeMessage(session, next);
 	},
 });
+
+const qnarecognizer = new builder_cognitiveservices.QnAMakerRecognizer({
+	knowledgeBaseId: '3013f4e6-897a-45fe-a4fb-d26eaf3837fa', // process.env.QnAKnowledgebaseId,
+	subscriptionKey: 'bf7c2defac3d4bf3bfcba85c7df27d08', // process.env.QnASubscriptionKey
+});
+const qnaMakerDialog = new builder_cognitiveservices.QnAMakerDialog({
+	recognizers: [qnarecognizer],
+	defaultMessage: 'No match! Try changing the query terms!',
+	qnaThreshold: 0.3,
+},
+);
+
+// Override to also include the knowledgebase question with the answer on confident matches
+// qnaMakerDialog.respondFromQnAMakerResult = (session, qnaMakerResult) => {
+// 	var result = qnaMakerResult;
+// 	var response = 'Here is the match from FAQ:  \r\n  Q: ' + result.answers[0].questions[0] + '  \r\n A: ' + result.answers[0].answer;
+// 	session.send(response);
+// }
+
+bot.dialog("/qnaMaker", qnaMakerDialog).triggerAction({ matches: "QnA" });
 
 function getEntity(botbuilder: any, args: any, entity: string): string {
 	return botbuilder.EntityRecognizer.findEntity(args.intent.entities.entities);
@@ -74,6 +100,13 @@ bot.dialog("/Hallo", [
 		session.send(`Hello, Dialog triggered`);
 	},
 ]).triggerAction({ matches: "Hallo" });
+
+bot.dialog("/", [
+	(session, args, next) => {
+		console.log("/".green);
+		session.send(`/ Dialog triggered`);
+	},
+]);
 
 bot.dialog("/Login",
 	(session, args) => {
@@ -132,11 +165,11 @@ bot.dialog("/setUsername", [
 	},
 ]).triggerAction({ matches: "setUsername" });
 
-bot.dialog("/", [
-	(sess, args, next) => {
-		sess.beginDialog("/handOverToHuman");
-	},
-]);
+// bot.dialog("/", [
+// 	(sess, args, next) => {
+// 		sess.beginDialog("/handOverToHuman");
+// 	},
+// ]);
 
 let currentClaim = "notSetYet";
 function createClaimObject(session: builder.Session): string {
@@ -149,7 +182,6 @@ function createClaimObject(session: builder.Session): string {
 }
 
 // Requirements on data to gather: https://docs.google.com/document/d/11pIyiS-iEqyGg6eaqsPiSQPk5rXXyDPoc4Rtx01AkYk/edit
-
 bot.dialog("/Schaden melden", [
 	(session, args, next) => {
 		// Give the claim a new ID
