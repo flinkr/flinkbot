@@ -45,14 +45,12 @@ bot.recognizer(new builder.LuisRecognizer(LuisModelUrl)
 	// filter low confidence message and route them to default see https://github.com/Microsoft/BotBuilder/issues/3530
 	.onFilter((context, result, callback) => {
 		console.log(JSON.stringify(result).cyan);
-		if (result.intent !== "None" && result.score < 0.0001) {
+		if (result.score < 0.8) {
 			// use qnamaker if there is no good result from LUIS
-			result.intent = "QnA";
-			// callback(null, { score: 0.7, intent: "/Hallo" });
-		// } else {
-		// 	callback(null, result);
+			result.intent = "QnAMaker";
+			result.score = 1;
 		}
-		// result.intents[0].intent = "QnA";
+		result.intents[0].intent = "QnAMaker";
 		console.log(JSON.stringify(result).red);
 		callback(null, result);
 	}),
@@ -73,17 +71,32 @@ const qnaMakerDialog = new builder_cognitiveservices.QnAMakerDialog({
 	recognizers: [qnarecognizer],
 	defaultMessage: 'No match! Try changing the query terms!',
 	qnaThreshold: 0.3,
-},
-);
+});
 
 // Override to also include the knowledgebase question with the answer on confident matches
-// qnaMakerDialog.respondFromQnAMakerResult = (session, qnaMakerResult) => {
-// 	var result = qnaMakerResult;
-// 	var response = 'Here is the match from FAQ:  \r\n  Q: ' + result.answers[0].questions[0] + '  \r\n A: ' + result.answers[0].answer;
-// 	session.send(response);
-// }
+qnaMakerDialog.respondFromQnAMakerResult = (session, qnaMakerResult) => {
+	const result = qnaMakerResult;
+	const response = 'Here is the match from QNA-Maker:  \r\n  Q: ' + result.answers[0].questions[0] + '  \r\n A: ' + result.answers[0].answer;
+	session.send(response);
+};
 
-bot.dialog("/qnaMaker", qnaMakerDialog).triggerAction({ matches: "QnA" });
+qnaMakerDialog.invokeAnswer = function(session: builder.Session, recognizeResult: any, threshold: any, noMatchMessage: any): any {
+	const qnaMakerResult = recognizeResult;
+	session.privateConversationData.qnaFeedbackUserQuestion = session.message.text;
+	if (qnaMakerResult.score >= threshold && qnaMakerResult.answers.length > 0) {
+		if (this.isConfidentAnswer(qnaMakerResult) || this.qnaMakerTools == null) {
+			this.respondFromQnAMakerResult(session, qnaMakerResult);
+			this.defaultWaitNextMessage(session, qnaMakerResult);
+		} else {
+			this.qnaFeedbackStep(session, qnaMakerResult);
+		}
+	} else {
+		session.beginDialog("/handOverToHuman");
+		this.defaultWaitNextMessage(session, qnaMakerResult);
+	}
+};
+
+bot.dialog("/qnaMaker", qnaMakerDialog).triggerAction({ matches: "QnAMaker" });
 
 function getEntity(botbuilder: any, args: any, entity: string): string {
 	return botbuilder.EntityRecognizer.findEntity(args.intent.entities.entities);
@@ -103,8 +116,9 @@ bot.dialog("/Hallo", [
 
 bot.dialog("/", [
 	(session, args, next) => {
-		console.log("/".green);
-		session.send(`/ Dialog triggered`);
+		console.log("/ reached, will be forwarded to human".green);
+		session.send(`/ Dialog triggered, forwarding to human`);
+		forwardIfLowConfidence(session, args);
 	},
 ]);
 
