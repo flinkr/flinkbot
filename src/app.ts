@@ -199,7 +199,91 @@ function createClaimObject(session: builder.Session): string {
 	}
 }
 
-
+// Requirements on data to gather: https://docs.google.com/document/d/11pIyiS-iEqyGg6eaqsPiSQPk5rXXyDPoc4Rtx01AkYk/edit
+bot.dialog("/Schaden melden", [
+	(session, args, next) => {
+		// Give the claim a new ID
+		currentClaim = createClaimObject(session);
+		console.log("This is current claim" + currentClaim);
+		builder.Prompts.choice(
+			session, "Was ist passiert? \n\n Wurde jemand verletzt,ist etwas kaputt gegangen oder ist dir etwas gestohlen worden?",
+			["Etwas kaputt", "Jemand verletzt", "Diebstahl"],
+			{
+				maxRetries: 3,
+				retryPrompt: "Bitte wähle eine der vorgeschlagenen Optionen aus, falls du nicht weiterkommst, schreibe Hilfe",
+				listStyle: 3,
+			},
+		);
+	},
+	(session, result, next) => {
+		console.log("response is: " + result.response.entity);
+		switch (result.response.entity) {
+			case "Etwas kaputt":
+				session.beginDialog("/getDamageOwner");
+				next();
+				break;
+			case "Jemand verletzt":
+				session.replaceDialog("/personenSchaden continued");
+				next();
+				break;
+			case "Diebstahl":
+				session.beginDialog("/getTheftLocation");
+				next();
+				break;
+			default:
+				console.log("........there was an error reached default!");
+				session.userData[currentClaim].type = "Diebstahl";
+				next();
+		}
+	},
+	(session, result) => {
+		builder.Prompts.text(session, "An welchem Datum ist es passiert?");
+	},
+	(session, result, next) => {
+		async function extractDate(): Promise<any> {
+			session.userData[currentClaim].date = await dateExtractor.extractDate(result.response);
+			console.log("This was saved as claim date in db" + session.userData[currentClaim].date);
+		}
+		extractDate();
+		next();
+	},
+	(session, result, next) => {
+		// construct a new message with the current session context
+		const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewClaimObjects(session.message.user.id, currentClaim));
+		session.send(msg);
+		bot.on("event", (event) => {
+			if (event.name === "claimObjectsSuccessful") {
+				console.log("Event received!! This is the event" + JSON.stringify(event));
+				session.send("Danke fürs eintragen, wenn du später etwas ändern willst, drücke einfach nochmals auf los gehts.!");
+				next();
+			}
+		});
+	},
+	// Mieterschaden
+	(session, result, next) => {
+		session.userData[currentClaim].description = result.response;
+		if (session.userData[currentClaim].type === "Mieterschaden") {
+			builder.Prompts.text(session, "Bitte gib noch die Kontaktdaten des Vermieters (Telefonnummer oder Email) an");
+		} else {
+			next();
+		}
+	},
+	(session, result, next) => {
+		builder.Prompts.text(session, "Bitte gib noch eine kurze Beschreibung, was passiert ist?");
+	},
+	(session, result) => {
+		session.userData[currentClaim].lenderContact = result.response;
+		builder.Prompts.text(session, "Wie ist deine IBAN-Kontonummer für die Rückzahlung?");
+	},
+	(session, result) => {
+		session.userData.iban = result.response;
+		builder.Prompts.text(session, "Wie ist deine Telefonnummer für allfällige Rückfragen?");
+	},
+	(session, result) => {
+		session.userData.phone = result.response;
+		session.send(`fertig, wurde eingereicht, here is your claim data ${JSON.stringify(session.userData[currentClaim])}`).endDialog();
+	},
+]).triggerAction({ matches: "Schaden melden" });
 
 bot.dialog("/personenSchaden continued", [
 	(session, args, next) => {
