@@ -104,3 +104,19 @@
 	// 		// todo use results.response.entity
 	// 	}
 	// ])
+	// bot.dialog("/", [
+// 	(sess, args, next) => {
+// 		sess.beginDialog("/handOverToHuman");
+// 	},
+// ]);
+
+// console.log(result.response);
+// switch (result.response.entity) {
+// 	case "Auswärts":
+// 		session.userData[currentClaim].auswärts = true;
+// 		console.log(`DATABASE NEW ENTRY: type: ${session.userData[currentClaim].litypeabilityContact}`.cyan);
+
+// 	default:
+// 		console.log("Not auswärts => continue");
+// }
+// session.endDialog();
