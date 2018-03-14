@@ -23,7 +23,7 @@
     "typescript": "^2.7.1"
   },
   "engines": {
-    "node": "6.13.3"
+    "node": "8.9.0"
   },
   "repository": {
     "type": "git",
