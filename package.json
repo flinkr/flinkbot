@@ -19,7 +19,7 @@
     "dotenv": "^5.0.0",
     "request-promise": "^4.2.2",
     "restify": "^6.3.4",
-    "typescript": "^2.7.1"
+    "typescript": "^2.7.2"
   },
   "engines": {
     "node": "4.0.0"
