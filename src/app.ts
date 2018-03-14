@@ -9,8 +9,8 @@ import * as builder_cognitiveservices from "botbuilder-cognitiveservices";
 import * as testDialog from './testdialog';
 import * as reportDamage from './dialogs/reportDamage';
 import * as tests from './dialogs/tests';
-import * as colors from "colors";
 /* tslint:disable */
+const colors  = require("colors");
 const azure = require("botbuilder-azure");
 
 /* tslint:enable */
