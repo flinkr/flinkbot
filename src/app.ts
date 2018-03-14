@@ -29,7 +29,7 @@ const docDbClient = new azure.DocumentDbClient(documentDbOptions);
 const cosmosStorage = new azure.AzureBotStorage({ gzipData: false }, docDbClient);
 const server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, () => {
-	console.log(`listening...${server.name}... ${server.url}`);
+	console.log(`server started...listening...${server.name}... ${server.url}`);
 });
 const conn = new builder.ChatConnector({
 	appId: process.env.MICROSOFT_APP_ID,
