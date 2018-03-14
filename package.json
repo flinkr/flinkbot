@@ -17,12 +17,13 @@
     "botbuilder-cognitiveservices": "^1.1.0",
     "colors": "^1.1.2",
     "dotenv": "^5.0.0",
+    "npm": "^5.7.1",
     "request-promise": "^4.2.2",
     "restify": "^6.3.4",
     "typescript": "^2.7.1"
   },
   "engines": {
-    "node": "5.6.0"
+    "node": "8.9.0"
   },
   "repository": {
     "type": "git",
