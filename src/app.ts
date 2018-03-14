@@ -3,9 +3,6 @@ import * as dotenv from "dotenv";
 import * as restify from "restify";
 import * as util from "util";
 import * as flinkapi from "./flinkapi";
-// import * as dateExtractor from "./dateExtractor";
-// import * as fb_attachments from "./fb_attachments";
-// import * as heroCards from "./heroCards";
 import * as middleware from "./middleware";
 import * as builder_cognitiveservices from "botbuilder-cognitiveservices";
 // import dialogs
@@ -13,8 +10,9 @@ import * as testDialog from './testdialog';
 import * as reportDamage from './dialogs/reportDamage';
 import * as tests from './dialogs/tests';
 /* tslint:disable */
+const colors: any  = require("colors");
 const azure = require("botbuilder-azure");
-const colors = require("colors");
+
 /* tslint:enable */
 dotenv.config();
 colors.enabled = true;
@@ -45,7 +43,7 @@ bot.recognizer(new builder.LuisRecognizer(LuisModelUrl)
 	// filter low confidence message and route them to default see https://github.com/Microsoft/BotBuilder/issues/3530
 	.onFilter((context, result, callback) => {
 		console.log(JSON.stringify(result));
-		if (enableQnA && result.score < 0.9) {
+		if (enableQnA && result.score < 0.6) {
 			// use qnamaker if there is no good result from LUIS
 			result.intents[0].intent = "QnAMaker";
 			result.intent = "QnAMaker";
