@@ -39,7 +39,7 @@ server.post("/api/messages", conn.listen());
 const LuisModelUrl = process.env.LUIS_MODEL_URL;
 
 const bot = new builder.UniversalBot(conn).set("storage", cosmosStorage);
-bot.recognizer(new builder.LuisRecognizer(LuisModelUrl)
+bot.recognizer(new builder.LuisRecognizer(LuisModelUrl),
 	// filter low confidence message and route them to default see https://github.com/Microsoft/BotBuilder/issues/3530
 	// .onFilter((context, result, callback) => {
 	// 	console.log(JSON.stringify(result));
