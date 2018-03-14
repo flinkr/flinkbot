@@ -15,10 +15,10 @@ export function logOutgoingMessage(session: any, next: any): void {
 
 export function routeMessage(session: any, next: any): void {
 	switch (session.conversationData.state) {
-		case "handedToHuman":
-			console.log("handed to human");
-			// don't do anything
-			return;
+		// case "handedToHuman":
+		// 	console.log("handed to human");
+		// 	// don't do anything
+		// 	return;
 		default:
 			console.log("processed by bot")
 			next();
