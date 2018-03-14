@@ -8,8 +8,7 @@ export function logIncomingMessage(session: any, next: any): void {
 }
 
 export function logOutgoingMessage(session: any, next: any): void {
-	console.log("This is log from middleware: " + session.message.text);
-	console.log("This is log from middleware: " + session.message.text);
+	console.log("....................This is log from middleware: " + session.message.text);
 	next();
 }
 
@@ -20,7 +19,7 @@ export function routeMessage(session: any, next: any): void {
 		// 	// don't do anything
 		// 	return;
 		default:
-			console.log("processed by bot")
+			console.log("processed by bot");
 			next();
 	}
 }
