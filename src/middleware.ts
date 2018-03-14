@@ -20,6 +20,7 @@ export function routeMessage(session: any, next: any): void {
 			// don't do anything
 			return;
 		default:
+			console.log("processed by bot")
 			next();
 	}
 }
