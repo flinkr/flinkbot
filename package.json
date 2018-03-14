@@ -9,6 +9,7 @@
     "postinstall": "tsc -p ."
   },
   "dependencies": {
+    "typescript": "^2.7.1",
     "@types/dotenv": "^4.0.2",
     "@types/restify": "^5.0.7",
     "@types/tedious": "^1.8.32",
@@ -18,8 +19,8 @@
     "colors": "^1.1.2",
     "dotenv": "^5.0.0",
     "request-promise": "^4.2.2",
-    "restify": "^6.3.4",
-    "typescript": "^2.7.2"
+    "restify": "^6.3.4"
+    
   },
   "engines": {
     "node": "4.0.0"
