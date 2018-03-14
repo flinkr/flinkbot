@@ -54,11 +54,11 @@ bot.recognizer(new builder.LuisRecognizer(LuisModelUrl),
 	// }),
 );
 
-bot.use({
-	botbuilder: (session, next) => {
-		middleware.routeMessage(session, next);
-	},
-});
+// bot.use({
+// 	botbuilder: (session, next) => {
+// 		middleware.routeMessage(session, next);
+// 	},
+// });
 
 bot.library(testDialog.createLibrary());
 bot.library(reportDamage.createLibrary());
