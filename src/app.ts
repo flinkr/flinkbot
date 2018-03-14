@@ -125,3 +125,10 @@ bot.dialog("/handOverToHuman", [
 		session.endDialog();
 	},
 ]).triggerAction({ matches: "handover" });
+
+bot.dialog("/Hallo", [
+	(session, args, next) => {
+		console.log('sending hallo back from hallo dialog');
+		session.send("Hallo Dialog triggered");
+	},
+]).triggerAction({ matches: "Hallo" });
