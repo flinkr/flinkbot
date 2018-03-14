@@ -1,0 +1,1 @@
+For color package, remove the bolt entry

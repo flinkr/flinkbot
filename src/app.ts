@@ -3,9 +3,6 @@ import * as dotenv from "dotenv";
 import * as restify from "restify";
 import * as util from "util";
 import * as flinkapi from "./flinkapi";
-// import * as dateExtractor from "./dateExtractor";
-// import * as fb_attachments from "./fb_attachments";
-// import * as heroCards from "./heroCards";
 import * as middleware from "./middleware";
 import * as builder_cognitiveservices from "botbuilder-cognitiveservices";
 // import dialogs
@@ -13,8 +10,9 @@ import * as testDialog from './testdialog';
 import * as reportDamage from './dialogs/reportDamage';
 import * as tests from './dialogs/tests';
 /* tslint:disable */
+const colors: any  = require("colors");
 const azure = require("botbuilder-azure");
-const colors = require("colors");
+
 /* tslint:enable */
 dotenv.config();
 colors.enabled = true;
