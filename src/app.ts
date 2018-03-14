@@ -10,7 +10,7 @@ import * as testDialog from './testdialog';
 import * as reportDamage from './dialogs/reportDamage';
 import * as tests from './dialogs/tests';
 /* tslint:disable */
-const colors  = require("colors");
+const colors: any  = require("colors");
 const azure = require("botbuilder-azure");
 
 /* tslint:enable */
