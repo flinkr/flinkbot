@@ -11,7 +11,7 @@ import * as reportDamage from './dialogs/reportDamage';
 import * as tests from './dialogs/tests';
 /* tslint:disable */
 const colors: any  = require("colors");
-const azure = require("botbuilder-azure");
+const azure: any = require("botbuilder-azure");
 
 /* tslint:enable */
 dotenv.config();
