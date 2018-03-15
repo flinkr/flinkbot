@@ -4,11 +4,12 @@ import * as flinkapi from "../flinkapi";
 
 export const createLibrary = () => {
 	const lib = new builder.Library('test');
-	lib.dialog("/Hallo", [
-		(session, args, next) => {
-			session.send("Hallo Dialog triggered");
-		},
-	]).triggerAction({ matches: "Hallo" });
+	// lib.dialog("/Hallo", [
+	// 	(session, args, next) => {
+	// 		console.log('sending hallo back from hallo dialog');
+	// 		session.send("Hallo Dialog triggered");
+	// 	},
+	// ]).triggerAction({ matches: "Hallo" });
 
 	lib.dialog("/testDateInput", [
 		(session, args, next) => {

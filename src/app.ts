@@ -11,7 +11,7 @@ import * as reportDamage from './dialogs/reportDamage';
 import * as tests from './dialogs/tests';
 /* tslint:disable */
 const colors: any  = require("colors");
-const azure = require("botbuilder-azure");
+const azure: any = require("botbuilder-azure");
 
 /* tslint:enable */
 dotenv.config();
@@ -29,7 +29,7 @@ const docDbClient = new azure.DocumentDbClient(documentDbOptions);
 const cosmosStorage = new azure.AzureBotStorage({ gzipData: false }, docDbClient);
 const server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, () => {
-	console.log(`listening...${server.name}... ${server.url}`);
+	console.log(`server started...listening...${server.name}... ${server.url}`);
 });
 const conn = new builder.ChatConnector({
 	appId: process.env.MICROSOFT_APP_ID,
@@ -125,3 +125,10 @@ bot.dialog("/handOverToHuman", [
 		session.endDialog();
 	},
 ]).triggerAction({ matches: "handover" });
+
+bot.dialog("/Hallo", [
+	(session, args, next) => {
+		console.log('sending hallo back from hallo dialog');
+		session.send("Hallo Dialog triggered");
+	},
+]).triggerAction({ matches: "Hallo" });
