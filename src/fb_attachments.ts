@@ -2,7 +2,7 @@
 // https://github.com/Microsoft/BotBuilder-Samples/blob/master/Node/blog-customChannelData/app.js
 // https://developers.facebook.com/docs/messenger-platform/reference/buttons/url
 
-export function fbWebviewLogin(userId: string): object {
+export function fbWebviewLogin(webviewUrl: string, userId: string): object {
 	return {
 		facebook: {
 			attachment: {
@@ -16,7 +16,7 @@ export function fbWebviewLogin(userId: string): object {
 							buttons: [
 								{
 									type: "web_url",
-									url: `https://flinkbot-webview-win.azurewebsites.net/login?userId=${userId}`,
+									url: `${webviewUrl}/login?userId=${userId}`,
 									title: "Login",
 									webview_height_ratio: "compact",
 									messenger_extensions: true,
@@ -30,7 +30,7 @@ export function fbWebviewLogin(userId: string): object {
 	};
 }
 
-export function fbWebviewClaimObjects(userId: string, currentClaimName: string): object {
+export function fbWebviewClaimObjects(webviewUrl: string, userId: string, currentClaimName: string): object {
 	return {
 		facebook: {
 			attachment: {
@@ -44,7 +44,7 @@ export function fbWebviewClaimObjects(userId: string, currentClaimName: string):
 							buttons: [
 								{
 									type: "web_url",
-									url: `https://flinkbot-webview-win.azurewebsites.net/claimObjects?userId=${userId}&currentClaimName=${currentClaimName}`,
+									url: `${webviewUrl}/claimObjects?userId=${userId}&currentClaimName=${currentClaimName}`,
 									title: "Los geht's",
 									webview_height_ratio: "compact",
 									messenger_extensions: true,

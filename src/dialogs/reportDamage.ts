@@ -1,6 +1,8 @@
 import * as builder from 'botbuilder';
 import * as fb_attachments from "../fb_attachments";
 import * as dateExtractor from "../dateExtractor";
+import * as dotenv from "dotenv";
+dotenv.config();
 
 let currentClaim = "notSetYet";
 function createClaimObject(session: builder.Session): string {
@@ -63,7 +65,7 @@ export const createLibrary = () => {
 		},
 		(session, result, next) => {
 			// construct a new message with the current session context
-			const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewClaimObjects(session.message.user.id, currentClaim));
+			const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewClaimObjects(process.env.WEBVIEW_URL, session.message.user.id, currentClaim));
 			session.send(msg);
 			lib.on("event", (event) => {
 				if (event.name === "claimObjectsSuccessful") {
