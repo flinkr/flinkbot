@@ -9,7 +9,7 @@ import * as builder_cognitiveservices from "botbuilder-cognitiveservices";
 import * as reportDamage from './dialogs/reportDamage';
 import * as tests from './dialogs/tests';
 /* tslint:disable */
-const colors: any  = require("colors");
+const colors: any = require("colors");
 const azure: any = require("botbuilder-azure");
 
 /* tslint:enable */
@@ -55,15 +55,16 @@ bot.use({
 
 bot.recognizer(new builder.LuisRecognizer(LuisModelUrl)
 	// filter low confidence message and route them to default see https://github.com/Microsoft/BotBuilder/issues/3530
-	.onFilter((context, result, callback) => {
-		if (devMode && result.score < 0.6) {
-			// use qnamaker if there is no good result from LUIS
-			result.intents[0].intent = "QnAMaker";
-			result.intent = "QnAMaker";
-			result.score = 1;
-		}
-		callback(null, result);
-	}),
+	// .onFilter((context, result, callback) => {
+	// 	if (devMode && result.score < 0.6) {
+	// 		// use qnamaker if there is no good result from LUIS
+	// 		console.log('forwarded to qnamaker'.cyan);
+	// 		result.intents[0].intent = "QnAMaker";
+	// 		result.intent = "QnAMaker";
+	// 		result.score = 1;
+	// 	}
+	// 	callback(null, result);
+	// }),
 );
 
 const qnarecognizer = new builder_cognitiveservices.QnAMakerRecognizer({
@@ -82,7 +83,7 @@ qnaMakerDialog.respondFromQnAMakerResult = (session, qnaMakerResult) => {
 	session.send(response);
 };
 // Override to not send a response when result not found but instead forward to Flink Team
-qnaMakerDialog.invokeAnswer = function(session: builder.Session, recognizeResult: any, threshold: any, noMatchMessage: any): any {
+qnaMakerDialog.invokeAnswer = function (session: builder.Session, recognizeResult: any, threshold: any, noMatchMessage: any): any {
 	const qnaMakerResult = recognizeResult;
 	session.privateConversationData.qnaFeedbackUserQuestion = session.message.text;
 	if (qnaMakerResult.score >= threshold && qnaMakerResult.answers.length > 0) {
@@ -101,7 +102,7 @@ qnaMakerDialog.invokeAnswer = function(session: builder.Session, recognizeResult
 
 bot.dialog("/", [
 	(session, args, next) => {
-		console.log("/ reached, will be forwarded to human".green);
+		console.log("/ reached, will be forwarded to human".cyan);
 		if (devMode) {
 			session.send(`/ Dialog triggered, forwarding to human`);
 		}
