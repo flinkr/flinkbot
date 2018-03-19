@@ -2,6 +2,7 @@ import * as builder from 'botbuilder';
 import * as fb_attachments from "../fb_attachments";
 import * as dateExtractor from "../dateExtractor";
 import * as dotenv from "dotenv";
+import * as ibanExtractor from "../utils/ibanExtractor";
 dotenv.config();
 
 let currentClaim = "notSetYet";
@@ -15,7 +16,7 @@ function createClaimObject(session: builder.Session): string {
 }
 
 export const createLibrary = () => {
-	const lib: any = new builder.Library('test');
+	const lib: any = new builder.Library('reportDamage');
 	lib.dialog("/Schaden melden", [
 		(session, args, next) => {
 			// Give the claim a new ID
@@ -87,13 +88,15 @@ export const createLibrary = () => {
 		(session, result, next) => {
 			builder.Prompts.text(session, "Bitte gib noch eine kurze Beschreibung, was passiert ist?");
 		},
-		(session, result) => {
+		(session, result, next) => {
 			session.userData[currentClaim].lenderContact = result.response;
-			builder.Prompts.text(session, "Wie ist deine IBAN-Kontonummer für die Rückzahlung?");
+			session.beginDialog("/getIBAN");
+			next();
 		},
-		(session, result) => {
+		(session, result, next) => {
 			session.userData.iban = result.response;
-			builder.Prompts.text(session, "Wie ist deine Telefonnummer für allfällige Rückfragen?");
+			session.beginDialog("/getPhoneNr");
+			next();
 		},
 		(session, result) => {
 			session.userData.phone = result.response;
@@ -109,13 +112,13 @@ export const createLibrary = () => {
 		(session, result, next) => {
 			builder.Prompts.text(session, "Bitte gib noch eine kurze Beschreibung, was passiert ist?");
 		},
-		(session, result) => {
-			session.userData[currentClaim].description = "Personenschaden";
-			builder.Prompts.text(session, "Wie ist deine Telefonnummer für allfällige Rückfragen?");
+		(session, result, next) => {
+			session.userData[currentClaim].description = result.response;
+			session.beginDialog("/getPhoneNr");
+			next();
 		},
 		(session, result) => {
-			session.userData.phone = result.response;
-			session.send(`fertig, wurde eingereicht, here is your claim data ${JSON.stringify(session.userData[currentClaim])}`).endDialog();
+			session.send(`fertig, wurde eingereicht, here is your claim data ${JSON.stringify(session.userData[currentClaim])} and your user data is ${JSON.stringify(session.userData[currentClaim])}`).endDialog();
 		},
 	]);
 	lib.dialog("/getDamageOwner", [
@@ -151,6 +154,41 @@ export const createLibrary = () => {
 			}
 		},
 	]);
+	lib.dialog("/getIBAN", [
+		(session, args, next) => {
+			console.log('testiban triggered');
+			if (args && args.reprompt) {
+				builder.Prompts.text(session, "Iban ist ungültig, bitte nochmals eingeben. (nur schweizer IBAN)");
+			} else {
+				builder.Prompts.text(session, "Hallo, wie ist deine Iban?");
+			}
+		},
+		(session, result) => {
+			const iban = ibanExtractor.extractIban(result.response);
+			if (iban === "false") {
+				session.send(``);
+				session.replaceDialog("/getIBAN", { reprompt: true });
+			} else {
+				session.send(`This is the result: ${iban}`);
+				session.userData.iban = iban;
+				session.endDialog();
+			}
+		},
+	]);
+
+	lib.dialog("/getPhoneNr", [
+		(session, result) => {
+			builder.Prompts.text(session, "Wie ist deine Telefonnummer für allfällige Rückfragen?");
+		},
+		(session, result) => {
+			let input: string = result.response;
+			input = input.replace(/\D/g, '');
+			session.userData.phone = input;
+			console.log(`Phone number is ${session.userData.phone}`.cyan);
+			session.endDialog();
+		},
+	]);
+
 	lib.dialog("/getRenterContact", [
 		(session, args, next) => {
 			builder.Prompts.text(session, "Bitte gib die Kontaktdaten deines Vermieters an (Email oder Tel.Nr)?");

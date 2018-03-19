@@ -9,14 +9,20 @@ import * as builder_cognitiveservices from "botbuilder-cognitiveservices";
 import * as reportDamage from './dialogs/reportDamage';
 import * as tests from './dialogs/tests';
 /* tslint:disable */
-const colors: any  = require("colors");
+const colors: any = require("colors");
 const azure: any = require("botbuilder-azure");
 
 /* tslint:enable */
 dotenv.config();
 colors.enabled = true;
-// disable forwarding to QnA for Testing
-const enableQnA = false;
+
+// disable forwarding and QnA for testing
+let devMode: boolean = false;
+// let enableQnA: boolean = true;
+// let enableForwarding: boolean = true;
+if (process.env.BotEnv === "develop") {
+	devMode = true;
+}
 
 const documentDbOptions = {
 	host: process.env.COSMOS_HOST,
@@ -38,20 +44,8 @@ server.post("/api/messages", conn.listen());
 const LuisModelUrl = process.env.LUIS_MODEL_URL;
 
 const bot = new builder.UniversalBot(conn).set("storage", cosmosStorage);
-bot.recognizer(new builder.LuisRecognizer(LuisModelUrl)
-	// filter low confidence message and route them to default see https://github.com/Microsoft/BotBuilder/issues/3530
-	.onFilter((context, result, callback) => {
-		// console.log(JSON.stringify(result));
-		if (enableQnA && result.score < 0.6) {
-			// use qnamaker if there is no good result from LUIS
-			result.intents[0].intent = "QnAMaker";
-			result.intent = "QnAMaker";
-			result.score = 1;
-		}
-		// console.log(JSON.stringify(result));
-		callback(null, result);
-	}),
-);
+bot.library(reportDamage.createLibrary());
+bot.library(tests.createLibrary());
 
 bot.use({
 	botbuilder: (session, next) => {
@@ -59,8 +53,19 @@ bot.use({
 	},
 });
 
-bot.library(reportDamage.createLibrary());
-bot.library(tests.createLibrary());
+bot.recognizer(new builder.LuisRecognizer(LuisModelUrl)
+	// filter low confidence message and route them to default see https://github.com/Microsoft/BotBuilder/issues/3530
+	.onFilter((context, result, callback) => {
+		if (devMode && result.score < 0.6) {
+			// use qnamaker if there is no good result from LUIS
+			console.log('forwarded to qnamaker'.cyan);
+			result.intents[0].intent = "QnAMaker";
+			result.intent = "QnAMaker";
+			result.score = 1;
+		}
+		callback(null, result);
+	}),
+);
 
 const qnarecognizer = new builder_cognitiveservices.QnAMakerRecognizer({
 	knowledgeBaseId: '3013f4e6-897a-45fe-a4fb-d26eaf3837fa', // process.env.QnAKnowledgebaseId,
@@ -69,16 +74,14 @@ const qnarecognizer = new builder_cognitiveservices.QnAMakerRecognizer({
 const qnaMakerDialog = new builder_cognitiveservices.QnAMakerDialog({
 	recognizers: [qnarecognizer],
 	defaultMessage: 'No match! Try changing the query terms!',
-	qnaThreshold: 0.3,
+	qnaThreshold: 0.6,
 });
-
 // Override to also include the knowledgebase question with the answer on confident matches
 qnaMakerDialog.respondFromQnAMakerResult = (session, qnaMakerResult) => {
 	const result = qnaMakerResult;
 	const response = 'Here is the match from QNA-Maker:  \r\n  Q: ' + result.answers[0].questions[0] + '  \r\n A: ' + result.answers[0].answer;
 	session.send(response);
 };
-
 // Override to not send a response when result not found but instead forward to Flink Team
 qnaMakerDialog.invokeAnswer = function(session: builder.Session, recognizeResult: any, threshold: any, noMatchMessage: any): any {
 	const qnaMakerResult = recognizeResult;
@@ -91,25 +94,19 @@ qnaMakerDialog.invokeAnswer = function(session: builder.Session, recognizeResult
 			this.qnaFeedbackStep(session, qnaMakerResult);
 		}
 	} else {
+		// hand over to human if confidence is too low
 		session.beginDialog("/handOverToHuman");
 		this.defaultWaitNextMessage(session, qnaMakerResult);
 	}
 };
 
-// function getEntity(botbuilder: any, args: any, entity: string): string {
-// 	return botbuilder.EntityRecognizer.findEntity(args.intent.entities.entities);
-// }
-
-function forwardIfLowConfidence(session: builder.Session, args: any): void {
-	// console.log("dialog was handed over because confidence is" + args.intent.score);
-	session.beginDialog("/handOverToHuman");
-}
-
 bot.dialog("/", [
 	(session, args, next) => {
-		console.log("/ reached, will be forwarded to human".green);
-		session.send(`/ Dialog triggered, forwarding to human`);
-		forwardIfLowConfidence(session, args);
+		console.log("/ reached, will be forwarded to human".cyan);
+		if (devMode) {
+			session.send(`/ Dialog triggered, forwarding to human`);
+		}
+		session.beginDialog("/handOverToHuman");
 	},
 ]);
 
