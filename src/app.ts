@@ -114,7 +114,7 @@ bot.dialog("/qnaMaker", qnaMakerDialog).triggerAction({ matches: "QnAMaker" });
 
 bot.dialog("/handOverToHuman", [
 	(session, args, next) => {
-		session.send("Wir leiten dich gleich an einen Flink-Mitarbeiter weiter!");
+		session.send("Das habe ich leider nicht ganz verstanden! Ich frage kurz einen Flink-Mitarbeiter um Rat");
 		flinkapi.getHumanOnSlack("The bot needs your help on facebook!");
 		session.conversationData.state = "handedToHuman";
 		session.endDialog();
