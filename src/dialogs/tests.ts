@@ -16,21 +16,25 @@ export const createLibrary = () => {
 		},
 	]).triggerAction({ matches: "Hallo" });
 
-	lib.dialog("/iban", [
-		(session, args, next) => {
-			console.log('testiban triggered');
-			builder.Prompts.text(session, "Hallo, wie ist deine Iban?");
-		},
-		(session, result) => {
-			const iban = ibanExtractor.extractIban(result.response);
-			if (iban === "false") {
-				session.send(`Iban ist ungültig, bitte nochmals eingeben.`);
-				session.replaceDialog("/iban");
-			} else {
-				session.send(`This is the result: ${iban}`);
-			}
-		},
-	]).triggerAction({ matches: "iban" });
+	// lib.dialog("/iban", [
+	// 	(session, args, next) => {
+	// 		console.log('testiban triggered');
+	// 		if (args && args.reprompt) {
+	// 			builder.Prompts.text(session, "Iban ist ungültig, bitte nochmals eingeben. (nur schweizer IBAN)");
+	// 		} else {
+	// 			builder.Prompts.text(session, "Hallo, wie ist deine Iban?");
+	// 		}
+	// 	},
+	// 	(session, result) => {
+	// 		const iban = ibanExtractor.extractIban(result.response);
+	// 		if (iban === "false") {
+	// 			session.send(``);
+	// 			session.replaceDialog("/iban", { reprompt: true });
+	// 		} else {
+	// 			session.send(`This is the result: ${iban}`);
+	// 		}
+	// 	},
+	// ]).triggerAction({ matches: "iban" });
 
 	lib.dialog("/testDateInput", [
 		(session, args, next) => {
