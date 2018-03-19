@@ -84,7 +84,6 @@ export const createLibrary = () => {
 	return lib.clone();
 };
 
-
 // bot.dialog('phonePrompt', [
 //     function (session, args) {
 //         if (args && args.reprompt) {
