@@ -130,3 +130,10 @@ bot.dialog("/Hallo", [
 		session.send("Hallo Dialog triggered");
 	},
 ]).triggerAction({ matches: "Hallo" });
+
+bot.dialog("/Test Dialog", [
+	(session, args, next) => {
+		console.log('test triggered'.cyan);
+		session.send("TEST triggered");
+	},
+]).triggerAction({ matches: "test dialog" });
