@@ -16,6 +16,17 @@ export const createLibrary = () => {
 		},
 	]).triggerAction({ matches: "Hallo" });
 
+	lib.dialog("/Test Dialog", [
+		(session, args, next) => {
+			console.log('test triggered'.cyan);
+			session.send("TEST triggered");
+			builder.Prompts.text(session, "Please say sth..?");
+		},
+		(session, result) => {
+			session.send(`you said ${result.response}`);
+		},
+	]).triggerAction({ matches: "test dialog" });
+
 	// lib.dialog("/iban", [
 	// 	(session, args, next) => {
 	// 		console.log('testiban triggered');
@@ -35,7 +46,6 @@ export const createLibrary = () => {
 	// 		}
 	// 	},
 	// ]).triggerAction({ matches: "iban" });
-
 	lib.dialog("/testDateInput", [
 		(session, args, next) => {
 			builder.Prompts.text(session, "Hi, user, what is your Birthday?");

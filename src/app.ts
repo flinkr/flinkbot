@@ -127,3 +127,5 @@ bot.dialog("/Hallo", [
 		session.send("Hallo Dialog triggered");
 	},
 ]).triggerAction({ matches: "Hallo" });
+
+

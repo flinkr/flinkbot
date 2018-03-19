@@ -16,7 +16,7 @@ function createClaimObject(session: builder.Session): string {
 }
 
 export const createLibrary = () => {
-	const lib: any = new builder.Library('test');
+	const lib: any = new builder.Library('reportDamage');
 	lib.dialog("/Schaden melden", [
 		(session, args, next) => {
 			// Give the claim a new ID
