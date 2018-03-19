@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@types/dotenv": "^4.0.2",
+    "@types/iban": "0.0.30",
     "@types/restify": "^5.0.7",
     "@types/tedious": "^1.8.32",
     "botbuilder": "^3.14.0",
@@ -17,6 +18,7 @@
     "botbuilder-cognitiveservices": "^1.1.0",
     "colors": "^1.1.2",
     "dotenv": "^5.0.0",
+    "iban": "0.0.10",
     "npm": "^5.7.1",
     "request-promise": "^4.2.2",
     "restify": "^6.3.4",
