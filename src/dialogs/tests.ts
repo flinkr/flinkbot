@@ -1,15 +1,36 @@
 import * as builder from 'botbuilder';
 import * as dateExtractor from "../dateExtractor";
 import * as flinkapi from "../flinkapi";
+import * as ibanExtractor from "../utils/ibanExtractor";
+/* tslint:disable */
+const colors: any = require("colors");
+/* tslint:enable */
+colors.enabled = true;
 
 export const createLibrary = () => {
 	const lib = new builder.Library('test');
-	// lib.dialog("/Hallo", [
-	// 	(session, args, next) => {
-	// 		console.log('sending hallo back from hallo dialog');
-	// 		session.send("Hallo Dialog triggered");
-	// 	},
-	// ]).triggerAction({ matches: "Hallo" });
+	lib.dialog("/Hallo", [
+		(session, args, next) => {
+			console.log('sending hallo back from hallo dialog'.blue);
+			session.send("Hallo Dialog triggered");
+		},
+	]).triggerAction({ matches: "Hallo" });
+
+	lib.dialog("/iban", [
+		(session, args, next) => {
+			console.log('testiban triggered');
+			builder.Prompts.text(session, "Hallo, wie ist deine Iban?");
+		},
+		(session, result) => {
+			const iban = ibanExtractor.extractIban(result.response);
+			if (iban === "false") {
+				session.send(`Iban ist ungültig, bitte nochmals eingeben.`);
+				session.replaceDialog("/iban");
+			} else {
+				session.send(`This is the result: ${iban}`);
+			}
+		},
+	]).triggerAction({ matches: "iban" });
 
 	lib.dialog("/testDateInput", [
 		(session, args, next) => {
@@ -58,3 +79,25 @@ export const createLibrary = () => {
 	]).triggerAction({ matches: "Meine PLZ" });
 	return lib.clone();
 };
+
+
+// bot.dialog('phonePrompt', [
+//     function (session, args) {
+//         if (args && args.reprompt) {
+//             builder.Prompts.text(session, "Enter the number using a format of either: '(555) 123-4567' or '555-123-4567' or '5551234567'")
+//         } else {
+//             builder.Prompts.text(session, "What's your phone number?");
+//         }
+//     },
+//     function (session, results) {
+//         var matched = results.response.match(/\d+/g);
+//         var number = matched ? matched.join('') : '';
+//         if (number.length == 10 || number.length == 11) {
+//             session.userData.phoneNumber = number; // Save the number.
+//             session.endDialogWithResult({ response: number });
+//         } else {
+//             // Repeat the dialog
+//             session.replaceDialog('phonePrompt', { reprompt: true });
+//         }
+//     }
+// ]);
