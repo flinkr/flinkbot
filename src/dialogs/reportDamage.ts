@@ -113,12 +113,12 @@ export const createLibrary = () => {
 			builder.Prompts.text(session, "Bitte gib noch eine kurze Beschreibung, was passiert ist?");
 		},
 		(session, result, next) => {
-			session.userData[currentClaim].description = "Personenschaden";
+			session.userData[currentClaim].description = result.response;
 			session.beginDialog("/getPhoneNr");
 			next();
 		},
 		(session, result) => {
-			session.send(`fertig, wurde eingereicht, here is your claim data ${JSON.stringify(session.userData[currentClaim])}`).endDialog();
+			session.send(`fertig, wurde eingereicht, here is your claim data ${JSON.stringify(session.userData[currentClaim])} and your user data is ${JSON.stringify(session.userData[currentClaim])}`).endDialog();
 		},
 	]);
 	lib.dialog("/getDamageOwner", [
