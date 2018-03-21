@@ -1,6 +1,6 @@
 import * as builder from 'botbuilder';
 import * as fb_attachments from "../fb_attachments";
-import * as dateExtractor from "../dateExtractor";
+import * as dateExtractor from "../utils/dateExtractor";
 import * as dotenv from "dotenv";
 import * as ibanExtractor from "../utils/ibanExtractor";
 dotenv.config();

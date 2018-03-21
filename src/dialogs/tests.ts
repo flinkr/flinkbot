@@ -1,5 +1,5 @@
 import * as builder from 'botbuilder';
-import * as dateExtractor from "../dateExtractor";
+import * as dateExtractor from "../utils/dateExtractor";
 import * as flinkapi from "../flinkapi";
 import * as ibanExtractor from "../utils/ibanExtractor";
 /* tslint:disable */
