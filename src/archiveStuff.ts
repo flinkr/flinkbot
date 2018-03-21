@@ -1,3 +1,4 @@
+/* tslint:disable */
 // import * as builder from 'botbuilder';
 
 // export const createLibrary = () => {
@@ -133,3 +134,23 @@
 // 		console.log("Not auswärts => continue");
 // }
 // session.endDialog();
+
+	// lib.dialog("/iban", [
+	// 	(session, args, next) => {
+	// 		console.log('testiban triggered');
+	// 		if (args && args.reprompt) {
+	// 			builder.Prompts.text(session, "Iban ist ungültig, bitte nochmals eingeben. (nur schweizer IBAN)");
+	// 		} else {
+	// 			builder.Prompts.text(session, "Hallo, wie ist deine Iban?");
+	// 		}
+	// 	},
+	// 	(session, result) => {
+	// 		const iban = ibanExtractor.extractIban(result.response);
+	// 		if (iban === "false") {
+	// 			session.send(``);
+	// 			session.replaceDialog("/iban", { reprompt: true });
+	// 		} else {
+	// 			session.send(`This is the result: ${iban}`);
+	// 		}
+	// 	},
+	// ]).triggerAction({ matches: "iban" });
