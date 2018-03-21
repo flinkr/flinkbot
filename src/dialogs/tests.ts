@@ -2,13 +2,14 @@ import * as builder from 'botbuilder';
 import * as dateExtractor from "../utils/dateExtractor";
 import * as flinkapi from "../flinkapi";
 import * as ibanExtractor from "../utils/ibanExtractor";
+import * as fb_attachments from "../attachments/fb_attachments";
 /* tslint:disable */
 const colors: any = require("colors");
 /* tslint:enable */
 colors.enabled = true;
 
 export const createLibrary = () => {
-	const lib = new builder.Library('tests');
+	const lib: any = new builder.Library('tests');
 	lib.dialog("/Hallo", [
 		(session, args, next) => {
 			console.log('sending hallo back from hallo dialog'.blue);
@@ -17,21 +18,18 @@ export const createLibrary = () => {
 	]).triggerAction({ matches: "Hallo" });
 
 	lib.dialog("/Test Dialog", [
-		(session, args, next) => {
-			const yes: boolean = false;
-			console.log('test triggered'.cyan);
-			if (yes) {
-				next();
-			} else  {
-				builder.Prompts.text(session, "Please say sth..?");
-			}
-		},
-		(session, result) => {
-			if (result.response) {
-				session.send(`This was respons ${result.response}`);
-			} else {
-				session.send(`skipped question`);
-			}
+		(session, result, next) => {
+			session.send("test dialog triggered");
+			// construct a new message with the current session context
+			const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewClaimObjects("https://flinkbot-webview-win.azurewebsites.net/", "2131231233", "claim1"));
+			session.send(msg);
+			lib.on("event", (event) => {
+				if (event.name === "claimObjectsSuccessful") {
+					console.log("Event received!! This is the event" + JSON.stringify(event));
+					session.send("Danke fürs eintragen, wenn du später etwas ändern willst, drücke einfach nochmals auf los gehts.!");
+					next();
+				}
+			});
 		},
 	]).triggerAction({ matches: "test dialog" });
 
