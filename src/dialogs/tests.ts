@@ -8,7 +8,7 @@ const colors: any = require("colors");
 colors.enabled = true;
 
 export const createLibrary = () => {
-	const lib = new builder.Library('test');
+	const lib = new builder.Library('tests');
 	lib.dialog("/Hallo", [
 		(session, args, next) => {
 			console.log('sending hallo back from hallo dialog'.blue);
@@ -27,25 +27,6 @@ export const createLibrary = () => {
 		},
 	]).triggerAction({ matches: "test dialog" });
 
-	// lib.dialog("/iban", [
-	// 	(session, args, next) => {
-	// 		console.log('testiban triggered');
-	// 		if (args && args.reprompt) {
-	// 			builder.Prompts.text(session, "Iban ist ungültig, bitte nochmals eingeben. (nur schweizer IBAN)");
-	// 		} else {
-	// 			builder.Prompts.text(session, "Hallo, wie ist deine Iban?");
-	// 		}
-	// 	},
-	// 	(session, result) => {
-	// 		const iban = ibanExtractor.extractIban(result.response);
-	// 		if (iban === "false") {
-	// 			session.send(``);
-	// 			session.replaceDialog("/iban", { reprompt: true });
-	// 		} else {
-	// 			session.send(`This is the result: ${iban}`);
-	// 		}
-	// 	},
-	// ]).triggerAction({ matches: "iban" });
 	lib.dialog("/testDateInput", [
 		(session, args, next) => {
 			builder.Prompts.text(session, "Hi, user, what is your Birthday?");

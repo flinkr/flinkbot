@@ -16,13 +16,8 @@ const azure: any = require("botbuilder-azure");
 dotenv.config();
 colors.enabled = true;
 
-// disable forwarding and QnA for testing
-let devMode: boolean = false;
 // let enableQnA: boolean = true;
 // let enableForwarding: boolean = true;
-if (process.env.BotEnv === "develop") {
-	devMode = true;
-}
 
 const documentDbOptions = {
 	host: process.env.COSMOS_HOST,
@@ -56,7 +51,7 @@ bot.use({
 bot.recognizer(new builder.LuisRecognizer(LuisModelUrl)
 	// filter low confidence message and route them to default see https://github.com/Microsoft/BotBuilder/issues/3530
 	.onFilter((context, result, callback) => {
-		if (devMode && result.score < 0.6) {
+		if (result.score < 0.6) {
 			// use qnamaker if there is no good result from LUIS
 			console.log('forwarded to qnamaker'.cyan);
 			result.intents[0].intent = "QnAMaker";
@@ -103,9 +98,6 @@ qnaMakerDialog.invokeAnswer = function(session: builder.Session, recognizeResult
 bot.dialog("/", [
 	(session, args, next) => {
 		console.log("/ reached, will be forwarded to human".cyan);
-		if (devMode) {
-			session.send(`/ Dialog triggered, forwarding to human`);
-		}
 		session.beginDialog("/handOverToHuman");
 	},
 ]);
@@ -114,8 +106,8 @@ bot.dialog("/qnaMaker", qnaMakerDialog).triggerAction({ matches: "QnAMaker" });
 
 bot.dialog("/handOverToHuman", [
 	(session, args, next) => {
-		if (devMode) {
-			session.send("Would be forwarded to Flinker but you are in test mode so nothing happens");
+		if (process.env.BotEnv === "develop") {
+			session.send("Slack message to timo sent. This will only be showed once with no more messages once it is in production.");
 		} else {
 			session.send("Das habe ich leider nicht ganz verstanden! Ich frage kurz einen Flink-Mitarbeiter um Rat");
 			flinkapi.getHumanOnSlack("The bot needs your help on facebook!");
@@ -124,10 +116,3 @@ bot.dialog("/handOverToHuman", [
 		session.endDialog();
 	},
 ]).triggerAction({ matches: "handover" });
-
-bot.dialog("/Hallo", [
-	(session, args, next) => {
-		console.log('sending hallo back from hallo dialog');
-		session.send("Hallo Dialog triggered");
-	},
-]).triggerAction({ matches: "Hallo" });
