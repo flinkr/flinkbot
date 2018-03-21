@@ -57,3 +57,31 @@ export function fbWebviewClaimObjects(webviewUrl: string, userId: string, curren
 		},
 	};
 }
+
+export function fbWebviewTest(): object {
+	return {
+		facebook: {
+			attachment: {
+				type: "template",
+				payload: {
+					template_type: "generic",
+					elements: [
+						{
+							title: "Bitte hier klicken um die Details einzutragen:",
+							// subtitle: "This is subtitle",
+							buttons: [
+								{
+									type: "web_url",
+									url: `https://www.goflink.ch`,
+									title: "Los geht's",
+									webview_height_ratio: "compact",
+									messenger_extensions: true,
+								},
+							],
+						},
+					],
+				},
+			},
+		},
+	};
+}

@@ -21,7 +21,7 @@ export const createLibrary = () => {
 		(session, result, next) => {
 			session.send("test dialog triggered");
 			// construct a new message with the current session context
-			const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewClaimObjects(process.env.WEBVIEW_URL, session.message.user.id, "claim1"));
+			const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewTest());
 			session.send(msg);
 			lib.on("event", (event) => {
 				if (event.name === "claimObjectsSuccessful") {
