@@ -74,7 +74,7 @@ const qnaMakerDialog = new builder_cognitiveservices.QnAMakerDialog({
 // Override to also include the knowledgebase question with the answer on confident matches
 qnaMakerDialog.respondFromQnAMakerResult = (session, qnaMakerResult) => {
 	const result = qnaMakerResult;
-	const response = 'Here is the match from QNA-Maker:  \r\n  Q: ' + result.answers[0].questions[0] + '  \r\n A: ' + result.answers[0].answer;
+	const response = 'Here is the match from QNA-Maker (will be changed for production ofc):  \r\n  Q: ' + result.answers[0].questions[0] + '  \r\n A: ' + result.answers[0].answer;
 	session.send(response);
 };
 // Override to not send a response when result not found but instead forward to Flink Team
