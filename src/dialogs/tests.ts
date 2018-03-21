@@ -18,12 +18,20 @@ export const createLibrary = () => {
 
 	lib.dialog("/Test Dialog", [
 		(session, args, next) => {
+			const yes: boolean = false;
 			console.log('test triggered'.cyan);
-			session.send("TEST triggered");
-			builder.Prompts.text(session, "Please say sth..?");
+			if (yes) {
+				next();
+			} else  {
+				builder.Prompts.text(session, "Please say sth..?");
+			}
 		},
 		(session, result) => {
-			session.send(`you said ${result.response}`);
+			if (result.response) {
+				session.send(`This was respons ${result.response}`);
+			} else {
+				session.send(`skipped question`);
+			}
 		},
 	]).triggerAction({ matches: "test dialog" });
 

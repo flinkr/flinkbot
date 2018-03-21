@@ -21,7 +21,7 @@ export const createLibrary = () => {
 		(session, args, next) => {
 			// Give the claim a new ID
 			currentClaim = createClaimObject(session);
-			console.log("This is current claim" + currentClaim);
+			console.log(`This is the current claim ${currentClaim}.cyan`);
 			builder.Prompts.choice(
 				session, "Was ist passiert? \n\n Wurde jemand verletzt,ist etwas kaputt gegangen oder ist dir etwas gestohlen worden?",
 				["Etwas kaputt", "Jemand verletzt", "Diebstahl"],
@@ -49,7 +49,7 @@ export const createLibrary = () => {
 					break;
 				default:
 					console.log("........there was an error reached default!");
-					session.userData[currentClaim].type = "Diebstahl";
+					session.userData[currentClaim].type = "ERROR";
 					next();
 			}
 		},
@@ -221,6 +221,9 @@ export const createLibrary = () => {
 				});
 		},
 		(session, result, next) => {
+			session.userData[currentClaim].location = result.response.entity;
+			session.userData[currentClaim].type = "Diebstahl";
+			console.log(`DATABASE NEW ENTRY: Location:  ${session.userData[currentClaim].location} and type ${session.userData[currentClaim].type}`.cyan);
 			session.endDialog();
 		},
 	]);
@@ -237,19 +240,17 @@ export const createLibrary = () => {
 		},
 		(session, result, next) => {
 			if (result.response.entity === "zuhause") {
-				session.userData[currentClaim].location = "at Home";
+				session.userData[currentClaim].location = "zuhause";
 				console.log(`DATABASE NEW ENTRY: Type:  ${session.userData[currentClaim].location}`.cyan);
-				next();
-			} else {
+				session.endDialog();
+			} else if (result.response.entity === "unterwegs") {
 				builder.Prompts.text(session, "Wo ist es passiert (z.B. Zürich, St.Gallen)?");
 			}
 		},
 		(session, result, next) => {
-			// if not undefined => not zuhause
-			if (result.response) {
-				session.userData[currentClaim].location = result.response;
-				console.log(`DATABASE NEW ENTRY: Type:  ${session.userData[currentClaim].location}`.cyan);
-			}
+			console.log(`This is result.response:  ${result.response}`.cyan);
+			session.userData[currentClaim].location = `Auswärts: ${result.response}`;
+			console.log(`DATABASE NEW ENTRY: Type:  ${session.userData[currentClaim].location}`.cyan);
 			session.endDialog();
 		},
 	]);
