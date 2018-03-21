@@ -118,7 +118,7 @@ export const createLibrary = () => {
 			next();
 		},
 		(session, result) => {
-			session.send(`fertig, wurde eingereicht, here is your claim data ${JSON.stringify(session.userData[currentClaim])} and your user data is ${JSON.stringify(session.userData[currentClaim])}`).endDialog();
+			session.send(`fertig, wurde eingereicht, here is your claim data ${JSON.stringify(session.userData[currentClaim])} and your user data is ${JSON.stringify(session.userData)}`).endDialog();
 		},
 	]);
 	lib.dialog("/getDamageOwner", [
