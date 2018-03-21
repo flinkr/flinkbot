@@ -21,7 +21,7 @@ export const createLibrary = () => {
 		(session, result, next) => {
 			session.send("test dialog triggered");
 			// construct a new message with the current session context
-			const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewClaimObjects("test.goflink.ch", "2131231233", "claim1"));
+			const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewClaimObjects("https://www.goflink.ch", "2131231233", "claim1"));
 			session.send(msg);
 			lib.on("event", (event) => {
 				if (event.name === "claimObjectsSuccessful") {
