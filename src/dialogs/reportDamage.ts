@@ -66,8 +66,7 @@ export const createLibrary = () => {
 		},
 		(session, result, next) => {
 			// construct a new message with the current session context
-			// const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewClaimObjects(process.env.WEBVIEW_URL, session.message.user.id, currentClaim));
-			const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewClaimObjects("https://flinkbot-webview-win.azurewebsites.net", session.message.user.id, currentClaim));
+			const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewClaimObjects(process.env.WEBVIEW_URL, session.message.user.id, currentClaim));
 			session.send(msg);
 			lib.on("event", (event) => {
 				if (event.name === "claimObjectsSuccessful") {
