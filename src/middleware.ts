@@ -6,7 +6,7 @@ dotenv.config();
 export function routeMessage(session: any, next: any): void {
 	switch (session.conversationData.state) {
 		case "handedToHuman":
-			if (process.env.BotEnv === "develop") {
+			if (process.env.BotEnv === "develop" || process.env.BotEnv === "prod") {
 				console.log("handed to human, but in DEV-mode");
 				// dont forward
 				next();

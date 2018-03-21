@@ -106,7 +106,7 @@ bot.dialog("/qnaMaker", qnaMakerDialog).triggerAction({ matches: "QnAMaker" });
 
 bot.dialog("/handOverToHuman", [
 	(session, args, next) => {
-		if (process.env.BotEnv === "develop") {
+		if (process.env.BotEnv === "develop" || process.env.BotEnv === "prod" ) {
 			session.send("Slack message to timo sent. This will only be showed once with no more messages once it is in production.");
 		} else {
 			session.send("Das habe ich leider nicht ganz verstanden! Ich frage kurz einen Flink-Mitarbeiter um Rat");
