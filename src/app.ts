@@ -51,12 +51,13 @@ bot.use({
 bot.recognizer(new builder.LuisRecognizer(LuisModelUrl)
 	// filter low confidence message and route them to default see https://github.com/Microsoft/BotBuilder/issues/3530
 	.onFilter((context, result, callback) => {
-		if (result.score < 0.6) {
+		if (result.score < 0.8) {
 			// use qnamaker if there is no good result from LUIS
 			console.log('forwarded to qnamaker'.cyan);
 			result.intents[0].intent = "QnAMaker";
 			result.intent = "QnAMaker";
-			result.score = 1;
+			// set to low score so it does not interrupt active dialogs
+			result.score = 0.3;
 		}
 		callback(null, result);
 	}),
