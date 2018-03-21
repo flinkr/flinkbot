@@ -6,8 +6,10 @@ export function routeMessage(session: any, next: any): void {
 	switch (session.conversationData.state) {
 		case "handedToHuman":
 			console.log("handed to human");
+			//for testing dont change anything
+			next();
 			// don't do anything
-			return;
+			// return;
 		default:
 			console.log("processed by bot");
 			next();
