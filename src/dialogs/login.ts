@@ -1,12 +1,15 @@
 import * as builder from 'botbuilder';
-import * as fb_attachments from "../fb_attachments";
+import * as fb_attachments from "../attachments/fb_attachments";
+import * as dotenv from "dotenv";
+/* tslint:enable */
+dotenv.config();
 
 export const createLibrary = () => {
 	const lib: any = new builder.Library('test');
 	lib.dialog("/Login",
 	(session, args) => {
 		// construct a new message with the current session context
-		const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewLogin(session.message.user.id));
+		const msg = new builder.Message(session).sourceEvent(fb_attachments.fbWebviewLogin(process.env.WEBVIEW_URL, session.message.user.id));
 		session.send(msg);
 		lib.on("event", (event) => {
 			if (event.name === "loginSucessful") {
